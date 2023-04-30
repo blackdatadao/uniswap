@@ -40,11 +40,14 @@ df3['value']=df3['withdrawable_tokens0']*df3['symbol0_price']+df3['withdrawable_
 df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration']].round(1)
 #convert time object of df3['create_time'] to time object with format '%m-%d %H:%M'
 df4['create_time']=df4['create_time'].map(lambda x:datetime.strptime(x,'%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M'))
+df4['tick_avg']=(df4['tick_lower']+df4['tick_upper'])/2
+#create new colomn which is fee_usdc/value/duration*24
+df4['apr']=df4['fee_usdc']/df4['value']/df4['duration']*24*100
 
 for index,row in df4.iterrows():
     with st.container():
-        st.markdown('**ID** '+str(row['nft_id'])+'  '+row['symbol0']+'/'+row['symbol1']+' **** '+str(row['tick_lower'])+'-'+str(row['tick_upper'])+' **FeeUSDC:** '+str(row['fee_usdc'])+' **Value:** '+str(row['value'])+' **Duration:** '+str(row['duration'])+' **** '+row['create_time'])    
-        st.markdown('**Token0:** '+str(row['create_token0'])+' **Token1:** '+str(row['create_token1'])+' **Token0 Withdrawable:** '+str(row['withdrawable_tokens0'])+' **Token1 Withdrawable:** '+str(row['withdrawable_tokens1']))   
+        st.markdown('**ID** '+str(row['nft_id'])+'  '+row['symbol0']+'/'+row['symbol1']+'<'+str(row['tick_lower'])+'-'+str(row['tick_upper'])+'>'+'<'+str(row['tick_avg'])+'>'+' **Duration:** '+str(row['duration'])+'mins'+' '+row['create_time'])    
+        st.markdown('**Token0:** '+str(row['create_token0'])+' **Token1:** '+str(row['create_token1'])+' **Withdrawable0:** '+str(row['withdrawable_tokens0'])+' **Withdrawable1:** '+str(row['withdrawable_tokens1'])+' **Fee:** '+str(row['fee_usdc'])+' **Value:** '+str(row['value'])+' **APR:** '+str(row['apr'])+'%')  
         st.write('---')
 
 # st.table(df4)
