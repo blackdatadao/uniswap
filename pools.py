@@ -74,6 +74,7 @@ df4['tick_avg']=(df4['tick_lower']+df4['tick_upper'])/2
 #create new colomn which is fee_usdc/value/duration*24
 df4['apr']=df4['fee_usdc']/df4['value']/df4['duration']*24*100
 df4=df4.round(1)
+df4=df4.sort_values(by='nft_id',ascending=True)
 for index,row in df4.iterrows():
     with st.container():
         st.markdown('**ID** '+str(row['nft_id'])+'  '+row['symbol0']+'/'+row['symbol1']+'<'+str(row['tick_lower'])+'-'+str(row['tick_upper'])+'>'+'<'+str(row['tick_avg'])+'>'+' **Duration:** '+str(row['duration'])+'mins'+' '+row['create_time'])    
