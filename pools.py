@@ -42,7 +42,7 @@ df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','with
 df4['create_time']=df4['create_time'].map(lambda x:datetime.strptime(x,'%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M'))
 
 for index,row in df4.iterrows():
-    with st.contianner():
+    with st.container():
         st.markdown('**NFT ID:** '+str(row['nft_id'])+' **Symbol:** '+row['symbol0']+'/'+row['symbol1']+' **Tick:** '+str(row['tick_lower'])+'-'+str(row['tick_upper'])+' **Fee:** '+str(row['fee_usdc'])+' **Value:** '+str(row['value'])+' **Duration:** '+str(row['duration'])+' **Create Time:** '+row['create_time'])    
         st.markdown('**Token0:** '+str(row['create_token0'])+' **Token1:** '+str(row['create_token1'])+' **Token0 Withdrawable:** '+str(row['withdrawable_tokens0'])+' **Token1 Withdrawable:** '+str(row['withdrawable_tokens1']))   
         st.write('---')
