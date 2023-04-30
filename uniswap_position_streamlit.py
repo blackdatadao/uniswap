@@ -15,12 +15,12 @@ provider_arb_2='https://arbitrum-mainnet.infura.io/v3/02040948aa024dc49e8730607e
 
 w3=Web3(HTTPProvider(provider_arb_2, {'timeout': 20}))
 
-with open(r"D:\app\uniswap_bot\arbitrum nft position manager v3 ABI.json") as json_file:
+with open(r"arbitrum nft position manager v3 ABI.json") as json_file:
         contract_abi = json.load(json_file)
 nft_position_manager=w3.eth.contract(
     address=Web3.to_checksum_address(contract_address.lower()),abi=contract_abi)
 
-with open(r"D:\app\uniswap_bot\factory ABI.json") as json_file:
+with open(r"factory ABI.json") as json_file:
         factory_abi = json.load(json_file)
 factory_contract=w3.eth.contract(address=Web3.to_checksum_address(factory_address.lower()),abi=factory_abi)
 wallet_address='0x9742499f4f1464c5b3dbf4d04adcbc977fbf7baa'
