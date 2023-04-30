@@ -8,6 +8,7 @@ from web3 import Web3,HTTPProvider
 import function as my
 from datetime import datetime
 import streamlit as st
+import concurrent.futures
 
 factory_address='0x1F98431c8aD98523631AE4a59f267346ea31F984'
 contract_address='0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
@@ -30,7 +31,36 @@ ethusdc_price=my.get_current_price_by_pool_address(w3,'0xC31E54c7a869B9FcBEcc143
 arbeth_price=my.get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
 arbusdc_price=1/arbeth_price*ethusdc_price
 
-df3=pd.read_csv('nft_data_open.csv')
+with open('nfts_list.json') as f:
+     nfts_list=json.load(f)
+
+nft_list=pd.DataFrame(nfts_list)
+
+
+#select the nfts which is open from the nft_list 
+df=nft_list[nft_list['closed']=='open'][1:]#delete a unnormal one
+
+nft_data = []
+
+def get_nft_data(nft_id, w3, factory_contract, nft_position_manager):
+    d = my.get_output_by_nft_id(nft_id, w3, factory_contract, nft_position_manager)
+    return d
+
+def main():
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = []
+        for nft_id in df['nft_id']:
+            future = executor.submit(get_nft_data, nft_id, w3, factory_contract, nft_position_manager)
+            results.append(future)
+    
+        for result in concurrent.futures.as_completed(results):
+            nft_data.append(result.result())
+    
+    return nft_data
+
+nft_data = main()
+
+df3=pd.DataFrame(nft_data)
 #create a new column 'symbol1_price',if symbol1 is arb,then symbole1_price is the arbusdc_price,else is the 1
 df3['symbol1_price']=df3['symbol1'].apply(lambda x: arbusdc_price if x=='ARB' else 1)
 #create a new column 'symbol0_price',its value is ethusdc_price
