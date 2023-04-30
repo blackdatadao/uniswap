@@ -1,0 +1,7 @@
+altair
+pandas
+streamlit
+web3
+eth_abi
+numpy
+plotly
