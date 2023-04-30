@@ -37,13 +37,13 @@ df3['symbol1_price']=df3['symbol1'].apply(lambda x: arbusdc_price if x=='ARB' el
 df3['symbol0_price']=ethusdc_price
 df3['fee_usdc']=df3['current_fee0']*df3['symbol0_price']+df3['current_fee1']*df3['symbol1_price']
 df3['value']=df3['withdrawable_tokens0']*df3['symbol0_price']+df3['withdrawable_tokens1']*df3['symbol1_price']
-df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration']].round(1)
+df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration']]
 #convert time object of df3['create_time'] to time object with format '%m-%d %H:%M'
 df4['create_time']=df4['create_time'].map(lambda x:datetime.strptime(x,'%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M'))
 df4['tick_avg']=(df4['tick_lower']+df4['tick_upper'])/2
 #create new colomn which is fee_usdc/value/duration*24
 df4['apr']=df4['fee_usdc']/df4['value']/df4['duration']*24*100
-
+df4=df4.round(1)
 for index,row in df4.iterrows():
     with st.container():
         st.markdown('**ID** '+str(row['nft_id'])+'  '+row['symbol0']+'/'+row['symbol1']+'<'+str(row['tick_lower'])+'-'+str(row['tick_upper'])+'>'+'<'+str(row['tick_avg'])+'>'+' **Duration:** '+str(row['duration'])+'mins'+' '+row['create_time'])    
