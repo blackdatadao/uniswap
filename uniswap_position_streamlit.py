@@ -20,7 +20,7 @@ with open(r"arbitrum nft position manager v3 ABI.json") as json_file:
 nft_position_manager=w3.eth.contract(
     address=Web3.to_checksum_address(contract_address.lower()),abi=contract_abi)
 
-with open(r"factory ABI.json") as json_file:
+with open(r"factory abi.json") as json_file:
         factory_abi = json.load(json_file)
 factory_contract=w3.eth.contract(address=Web3.to_checksum_address(factory_address.lower()),abi=factory_abi)
 wallet_address='0x9742499f4f1464c5b3dbf4d04adcbc977fbf7baa'
