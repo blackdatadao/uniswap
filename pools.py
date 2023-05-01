@@ -81,7 +81,7 @@ df4=df4.sort_values(by='nft_id',ascending=True)
 for index,row in df4.iterrows():
     with st.container():
         color = "green" if row['tick_lower'] < row['current_price'] and row['tick_upper'] > row['current_price'] else "black"
-        st.markdown(f'<span style="color: {color};"><strong>{row["symbol0"]}/{row["symbol1"]} < {row["tick_upper"]}-{row["tick_lower"]}></strong>@{row["tick_avg"]}  |  **Create:** {row["create_token0"]}/{row["create_token1"]} @{row["create_time"]}|{row["duration"]}H **#** {row["nft_id"]}</span>', unsafe_allow_html=True)
+        st.markdown(f'<span style="color: {color};"><strong>{row["symbol0"]}/{row["symbol1"]} < {row["tick_lower"]}-{row["tick_upper"]}></strong>@{row["tick_avg"]}  |  **Create:** {row["create_token0"]}/{row["create_token1"]} @{row["create_time"]}|{row["duration"]}H **#** {row["nft_id"]}</span>', unsafe_allow_html=True)
         st.markdown(f'<span style="color: {color};"><strong>**Fee** {row["fee_usdc"]}</strong> < {row["withdrawable_tokens0"]}|{row["withdrawable_tokens1"]}> **value** {row["value"]} | {row["return"]} % **day** {row["apr"]} %</span>', unsafe_allow_html=True)
 
 #         st.markdown(f'<span style="color: {color};"><strong>**NFT ID:** {row["nft_id"]}</strong> | **Tick Upper:** {row["tick_upper"]} | **Tick Lower:** {row["tick_lower"]} | **Symbol0:** {row["symbol0"]} | **Symbol1:** {row["symbol1"]} | **Create Token0:** {row["create_token0"]} | **Create Token1:** {row["create_token1"]}</span>', unsafe_allow_html=True)
