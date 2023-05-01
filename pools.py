@@ -189,9 +189,10 @@ def get_history_price_etharb(
         # df['data_decoded']=df['data_decoded'].map(lambda x:eval(x))
         #split data_decoded to 3 columns
         df['sqrtPrice']=df['data_decoded'].map(lambda x:x[2])
+        df=df[(df['amount0']!=0)&(df['amount1']!=0)]
         df['amount0']=abs(df['data_decoded'].map(lambda x:x[0]))
         df['amount1']=abs(df['data_decoded'].map(lambda x:x[1]))
-
+        
         # df['tick']=df['data_decoded'].map(lambda x:x[3])
         decimals1=18
         decimals0=18 #ETH
@@ -249,17 +250,6 @@ def get_swap_price_ethusdc(
     else:
         raise Exception('fetched None')
 
-
-provider_arb='https://arb1.arbitrum.io/rpc'
-provider_arb_2='https://arbitrum-mainnet.infura.io/v3/02040948aa024dc49e8730607e0caece'
-w3=Web3(HTTPProvider(provider_arb_2, {'timeout': 20}))
-
-
-
-# # Read JSON data and convert to pandas DataFrame
-# with open('data.json', 'r') as f:
-#     data = json.load(f)
-# df = pd.DataFrame(data)
 
 
 df=get_history_price_etharb(w3)
