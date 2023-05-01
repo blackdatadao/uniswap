@@ -67,7 +67,7 @@ df3['symbol1_price']=df3['symbol1'].apply(lambda x: arbusdc_price if x=='ARB' el
 df3['symbol0_price']=ethusdc_price
 df3['fee_usdc']=df3['current_fee0']*df3['symbol0_price']+df3['current_fee1']*df3['symbol1_price']
 df3['value']=df3['withdrawable_tokens0']*df3['symbol0_price']+df3['withdrawable_tokens1']*df3['symbol1_price']
-df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration']]
+df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration','current_price']
 #convert time object of df3['create_time'] to time object with format '%m-%d %H:%M'
 df4['create_time']=df4['create_time'].map(lambda x:datetime.strptime(x,'%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M'))
 df4['tick_avg']=(df4['tick_lower']+df4['tick_upper'])/2
