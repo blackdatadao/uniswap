@@ -38,6 +38,14 @@ ethusdc_price=my.get_current_price_by_pool_address(w3,'0xC31E54c7a869B9FcBEcc143
 arbeth_price=my.get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
 arbusdc_price=1/arbeth_price*ethusdc_price
 
+try:
+    my.update_nft_list(wallet_address,w3,nft_position_manager)
+except:
+    print('error,retry...')
+    my.update_nft_list(wallet_address,w3,nft_position_manager)
+print('update nft_list finished,wallet address ',wallet_address)
+
+
 with open('nfts_list.json') as f:
      nfts_list=json.load(f)
 
