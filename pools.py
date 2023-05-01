@@ -189,9 +189,10 @@ def get_history_price_etharb(
         # df['data_decoded']=df['data_decoded'].map(lambda x:eval(x))
         #split data_decoded to 3 columns
         df['sqrtPrice']=df['data_decoded'].map(lambda x:x[2])
-        df=df[(df['amount0']!=0)&(df['amount1']!=0)]
+        
         df['amount0']=abs(df['data_decoded'].map(lambda x:x[0]))
         df['amount1']=abs(df['data_decoded'].map(lambda x:x[1]))
+        df=df[(df['amount0']!=0)&(df['amount1']!=0)]
         
         # df['tick']=df['data_decoded'].map(lambda x:x[3])
         decimals1=18
