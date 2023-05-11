@@ -14,7 +14,7 @@ from eth_abi import decode
 import numpy as np
 import plotly.express as px
 
-
+pd.set_option("dispaly.float_format", "{:.1f}".format)
 
 
 factory_address='0x1F98431c8aD98523631AE4a59f267346ea31F984'
