@@ -99,10 +99,10 @@ df_inrange=df4[(df4['current_price']>=df4['tick_lower'])&(df4['current_price']<=
 df_outrange=df4[(df4['current_price']<df4['tick_lower'])|(df4['current_price']>df4['tick_upper'])]
 
 def get_summary(df):
-    df_balance=df4.groupby(['symbol0','symbol1'])[['withdrawable_tokens0','withdrawable_tokens1']].sum()
-    df_create=df4.groupby(['symbol0','symbol1'])[['create_token0','create_token1']].sum()
-    df_fee=df4.groupby(['symbol0','symbol1'])[['fee_usdc']].sum()
-    df_value=df4.groupby(['symbol0','symbol1'])[['value']].sum()
+    df_balance=df.groupby(['symbol0','symbol1'])[['withdrawable_tokens0','withdrawable_tokens1']].sum()
+    df_create=df.groupby(['symbol0','symbol1'])[['create_token0','create_token1']].sum()
+    df_fee=df.groupby(['symbol0','symbol1'])[['fee_usdc']].sum()
+    df_value=df.groupby(['symbol0','symbol1'])[['value']].sum()
     #combine df_balance,df_create,df_fee,df_value
     df_summary=pd.concat([df_balance,df_create,df_fee,df_value],axis=1)
     df_summary['token0_delta']=df_summary['withdrawable_tokens0']-df_summary['create_token0']
