@@ -117,7 +117,7 @@ summary=get_summary(df4).round(1)
 
 # create a stremlit table with title
 st.title('total summary')
-st.table(summary)
+st.table(summary.round(1))
 st.title('total summary inrange')
 st.table(summary_inrange)
 st.title('total summary outrange')
