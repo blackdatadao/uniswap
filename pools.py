@@ -122,7 +122,7 @@ st.table(summary.round(1))
 st.title('total summary inrange')
 st.table(summary_inrange)
 st.title('total summary outrange')
-st.table(summary_outrange)
+st.dataframe(summary_outrange)
 
 
 for index,row in df4.iterrows():
