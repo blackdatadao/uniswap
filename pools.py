@@ -111,13 +111,13 @@ def get_summary(df):
     return df_summary
 
 
-summary_inrange=get_summary(df_inrange)
-summary_outrange=get_summary(df_outrange)
-summary=get_summary(df4)
+summary_inrange=get_summary(df_inrange).round(1)
+summary_outrange=get_summary(df_outrange).round(1)
+summary=get_summary(df4).round(1)
 
 # create a stremlit table with title
 st.title('total summary')
-st.table(df4)
+st.table(summary)
 st.title('total summary inrange')
 st.table(summary_inrange)
 st.title('total summary outrange')
