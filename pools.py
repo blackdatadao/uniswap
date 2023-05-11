@@ -109,6 +109,7 @@ def get_summary(df):
     df_summary['token1_delta']=df_summary['withdrawable_tokens1']-df_summary['create_token1']
     df_summary['average_cost']=df_summary['token1_delta']/df_summary['token0_delta']
     df_summary=df_summary.applymap(lambda x:round(x,1) if isinstance(x,float) else x)
+    df_summary.columns=['w0','w1','c0','c1','fee','value','delta0','delta1','cost']
     return df_summary
 
 
@@ -117,11 +118,11 @@ summary_outrange=get_summary(df_outrange)
 summary=get_summary(df4)
 
 # create a stremlit table with title
-st.title('total summary')
-st.table(summary.round(1))
-st.title('total summary inrange')
-st.table(summary_inrange)
-st.title('total summary outrange')
+st.markdown('total summary')
+st.dataframe(summary.round(1))
+st.markdown('total summary inrange')
+st.dataframe(summary_inrange)
+st.markdown('total summary outrange')
 st.dataframe(summary_outrange)
 
 
