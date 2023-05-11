@@ -14,7 +14,7 @@ from eth_abi import decode
 import numpy as np
 import plotly.express as px
 
-pd.set_option("dispaly.float_format", "{:.1f}".format)
+# pd.set_option("dispaly.float_format", "{:.1f}".format)
 
 
 factory_address='0x1F98431c8aD98523631AE4a59f267346ea31F984'
@@ -108,12 +108,13 @@ def get_summary(df):
     df_summary['token0_delta']=df_summary['withdrawable_tokens0']-df_summary['create_token0']
     df_summary['token1_delta']=df_summary['withdrawable_tokens1']-df_summary['create_token1']
     df_summary['average_cost']=df_summary['token1_delta']/df_summary['token0_delta']
+    df_summary=df_summary.applymap(lambda x:round(x,1) if isinstance(x,float) else x)
     return df_summary
 
 
-summary_inrange=get_summary(df_inrange).round(1)
-summary_outrange=get_summary(df_outrange).round(1)
-summary=get_summary(df4).round(1)
+summary_inrange=get_summary(df_inrange)
+summary_outrange=get_summary(df_outrange)
+summary=get_summary(df4)
 
 # create a stremlit table with title
 st.title('total summary')
