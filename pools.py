@@ -93,6 +93,37 @@ df4['return']=df4['fee_usdc']/df4['value']*100
 df4=df4.round(1)
 df4=df4.sort_values(by='nft_id',ascending=True)
 
+#select the data from df4 where current price in range of tick_lower and tick_upper
+df_inrange=df4[(df4['current_price']>=df4['tick_lower'])&(df4['current_price']<=df4['tick_upper'])]
+# select the data from df4 where current price is not in range of tick_lower and tick_upper
+df_outrange=df4[(df4['current_price']<df4['tick_lower'])|(df4['current_price']>df4['tick_upper'])]
+
+def get_summary(df):
+    df_balance=df4.groupby(['symbol0','symbol1'])[['withdrawable_tokens0','withdrawable_tokens1']].sum()
+    df_create=df4.groupby(['symbol0','symbol1'])[['create_token0','create_token1']].sum()
+    df_fee=df4.groupby(['symbol0','symbol1'])[['fee_usdc']].sum()
+    df_value=df4.groupby(['symbol0','symbol1'])[['value']].sum()
+    #combine df_balance,df_create,df_fee,df_value
+    df_summary=pd.concat([df_balance,df_create,df_fee,df_value],axis=1)
+    df_summary['token0_delta']=df_summary['withdrawable_tokens0']-df_summary['create_token0']
+    df_summary['token1_delta']=df_summary['withdrawable_tokens1']-df_summary['create_token1']
+    df_summary['average_cost']=df_summary['token1_delta']/df_summary['token0_delta']
+    return df_summary
+
+
+summary_inrange=get_summary(df_inrange)
+summary_outrange=get_summary(df_outrange)
+summary=get_summary(df4)
+
+# create a stremlit table with title
+st.title('total summary')
+st.table(df4)
+st.title('total summary inrange')
+st.table(summary_inrange)
+st.title('total summary outrange')
+st.table(summary_outrange)
+
+
 for index,row in df4.iterrows():
     with st.container():
         color = "green" if row['tick_lower'] < row['current_price'] and row['tick_upper'] > row['current_price'] else "black"
