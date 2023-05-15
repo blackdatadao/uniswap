@@ -197,7 +197,7 @@ def get_history_price_etharb(
         connection
     ):
     # fb=74711249,tb=74811249
-    minutes=120
+    minutes=1440
     fb=connection.eth.block_number-3*60*minutes
     tb=connection.eth.block_number
     cAddress="0xc6f780497a95e246eb9449f5e4770916dcd6396a"
