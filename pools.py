@@ -63,13 +63,13 @@ nft_list=pd.DataFrame(nfts_list)
 #select the nfts which is open from the nft_list 
 df=nft_list[nft_list['closed']=='open'][1:]#delete a unnormal one
 
-nft_data = []
 
 def get_nft_data(nft_id, w3, factory_contract, nft_position_manager):
     d = my.get_output_by_nft_id(nft_id, w3, factory_contract, nft_position_manager)
     return d
 
-def main():
+def get_pools_details(df):
+    nft_data = []
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = []
         for nft_id in df['nft_id']:
@@ -81,7 +81,7 @@ def main():
     
     return nft_data
 
-nft_data = main()
+nft_data = get_pools_details(df)
 
 df3=pd.DataFrame(nft_data)
 #create a new column 'symbol1_price',if symbol1 is arb,then symbole1_price is the arbusdc_price,else is the 1
