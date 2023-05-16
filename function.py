@@ -652,7 +652,7 @@ def get_nft_data_since_last_index(w3,nft_position_manager,factory_contract,curre
 def send_data_to_server(nft_list):
     url='http://42.192.17.155/nft_list'
     
-    json_data = bytes(nft_list).encode('utf-8')
+    json_data = bytes(nft_list.encode('utf-8'))
     # Send the JSON data to the server
     response = requests.post(url, data=json_data)
     # Check if the POST request was successful
