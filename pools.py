@@ -49,7 +49,7 @@ print('update nft_list finished,wallet address ',wallet_address)
 url='http://42.192.17.155/nft_list'
 response = requests.get(url)
 assert response.status_code==200
-nft_list=response.json()
+nfts_list=response.json()
         
 # with open('nfts_list.json') as f:
 #      nfts_list=json.load(f)
