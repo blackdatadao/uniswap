@@ -10,6 +10,7 @@ import pandas as pd
 from flowint import UFlow
 import numpy as np
 from datetime import datetime
+import requests
 # import streamlit as st
 
 #all nfts with same contract address. nft position manager and nft pools are differnt contracts
@@ -648,11 +649,27 @@ def get_nft_data_since_last_index(w3,nft_position_manager,factory_contract,curre
         index=index+1
     return nft_data
 
+def send_data_to_server(nft_list):
+    url='http://42.192.17.155/nft_list'
+    
+    json_data = bytes(nft_list).encode('utf-8'))
+    # Send the JSON data to the server
+    response = requests.post(url, data=json_data)
+    # Check if the POST request was successful
+    if response.status_code == 200:
+        print("Data successfully sent to server.")
+    else:
+        print("Failed to send data to server.")
+
 def update_nft_list(wallet_address,w3,nft_position_manager):
     #update nft list to the current time and save to json file
     #load json file
-    with open('nfts_list.json') as f:
-        nfts_list = json.load(f)
+#     with open('nfts_list.json') as f:
+#         nfts_list = json.load(f)
+    url='http://42.192.17.155/nft_list'
+    response = requests.get(url)
+    assert response.status_code==200
+    nft_list=response.json()
     #convert nft_list to dataframe
     df=pd.DataFrame(nfts_list)
     #select the lastest index from dataframe
@@ -675,6 +692,7 @@ def update_nft_list(wallet_address,w3,nft_position_manager):
     nfts_list.extend(new_nfts)
     #save nft_list to json file
     # update_time=time.strftime("%Y_%m_%d_%H_%M_%S",time.time())
+    send_data_to_server(nft_list)
     with open('nfts_list.json', 'w') as f:
         json.dump(nfts_list, f)
 
