@@ -685,7 +685,7 @@ def update_nft_list(wallet_address,w3,nft_position_manager):
         if liquidity==0:
             df.loc[index,'closed']='closed'
     #convert df to list
-    nft_list=df.to_dict('records')
+    nfts_list=df.to_dict('records')
     #get the new nfts
     new_nfts=get_new_NFTS_by_address(wallet_address,w3,nft_position_manager,last_index)
     #append new_nfts to nft_list
@@ -693,8 +693,8 @@ def update_nft_list(wallet_address,w3,nft_position_manager):
     #save nft_list to json file
     # update_time=time.strftime("%Y_%m_%d_%H_%M_%S",time.time())
     send_data_to_server(nfts_list)
-    with open('nfts_list.json', 'w') as f:
-        json.dump(nfts_list, f)
+#     with open('nfts_list.json', 'w') as f:
+#         json.dump(nfts_list, f)
 
 def update_nft_data(w3,factory_contract,current_price):
     with open('nfts_list.json') as f:
