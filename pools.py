@@ -298,7 +298,7 @@ def get_history_price_ethusdc(
         df=df[(df['amount0']!=0)&(df['amount1']!=0)]
         
         # df['tick']=df['data_decoded'].map(lambda x:x[3])
-        decimals1=18
+        decimals1=6
         decimals0=18 #ETH
         df['price0'] = df['amount1']/10**decimals1/(df['amount0']/10**decimals0)
         # Calculate the price of token0 in terms of token1
