@@ -669,7 +669,7 @@ def update_nft_list(wallet_address,w3,nft_position_manager):
     url='http://42.192.17.155/nft_list'
     response = requests.get(url)
     assert response.status_code==200
-    nft_list=response.json()
+    nfts_list=response.json()
     #convert nft_list to dataframe
     df=pd.DataFrame(nfts_list)
     #select the lastest index from dataframe
@@ -692,7 +692,7 @@ def update_nft_list(wallet_address,w3,nft_position_manager):
     nfts_list.extend(new_nfts)
     #save nft_list to json file
     # update_time=time.strftime("%Y_%m_%d_%H_%M_%S",time.time())
-    send_data_to_server(nft_list)
+    send_data_to_server(nfts_list)
     with open('nfts_list.json', 'w') as f:
         json.dump(nfts_list, f)
 
