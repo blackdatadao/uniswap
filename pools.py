@@ -399,7 +399,7 @@ fig.update_layout(title='ETH/usdc price')
 st.plotly_chart(fig, use_container_width=True
                 )
 
-iframe_url='https://dune.com/blackdatadao/arb-eth-price-on-uniswap-v3-on-arbitrum-chain'
+iframe_url='https://dune.com/embeds/2272843/3725900'
 i_width=600
 i_height=400
 iframe(iframe_url, width=i_width, height=i_height, scrolling=True)
