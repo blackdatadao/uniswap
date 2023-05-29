@@ -15,6 +15,9 @@ import numpy as np
 import plotly.express as px
 import requests
 
+from streamlit.components.v1 import iframe
+
+
 # pd.set_option("dispaly.float_format", "{:.1f}".format)
 
 
@@ -395,3 +398,9 @@ fig.update_layout(title='ETH/usdc price')
 # fig.update_yaxes(range=[y_min, y_max])
 st.plotly_chart(fig, use_container_width=True
                 )
+
+iframe_url='https://dune.com/blackdatadao/arb-eth-price-on-uniswap-v3-on-arbitrum-chain'
+i_width=600
+i_height=400
+iframe(iframe_url, width=i_width, height=i_height, scrolling=True)
+
