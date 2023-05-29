@@ -404,5 +404,14 @@ i_width=600
 i_height=400
 iframe(iframe_url, width=i_width, height=i_height, scrolling=True)
 
+url_table_arb_price_vol='https://dune.com/embeds/2272843/3725430'
+url_usd_vol='https://dune.com/embeds/2349162/3846118'
+url_op_price_vol='https://dune.com/embeds/2331467/3816872'
+
+iframe(url_usd_vol, width=i_width, height=i_height, scrolling=True)
+iframe(url_op_price_vol, width=i_width, height=i_height, scrolling=True)
+iframe(url_table_arb_price_vol, width=i_width, height=i_height, scrolling=True)
+
+
 url="https://info.uniswap.org/#/arbitrum/"
 st.markdown(f"[official data]({url})")
