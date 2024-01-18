@@ -64,7 +64,7 @@ nft_list=pd.DataFrame(nfts_list)
 
 
 #select the nfts which is open from the nft_list 
-df=nft_list[nft_list['closed']=='open'][1:]#delete a unnormal one
+df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
 
 
 def get_nft_data(nft_id, w3, factory_contract, nft_position_manager):
