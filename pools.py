@@ -373,6 +373,12 @@ fig.update_layout(title='ETH/arb price')
 st.plotly_chart(fig, use_container_width=True
                 )
 
+import logging
+from binance.spot import Spot as Client
+from binance.lib.utils import config_logging
+import pandas as pd
+from datetime import datetime
+import plotly.graph_objects as go
 
 import logging
 from binance.spot import Spot as Client
