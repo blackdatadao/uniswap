@@ -391,10 +391,9 @@ config_logging(logging, logging.DEBUG)
 
 spot_client = Client(base_url="https://testnet.binance.vision")
 
-# logging.info(spot_client.klines("BTCUSDT", "1m"))
-x=spot_client.klines("ARBETH", "4h", limit=10)
+# 1 hours klines
+x=spot_client.klines("ARBETH", "1h", limit=30)
 #convert to dateframe
-
 df=pd.DataFrame(x)
 df.columns=['Open Time','Open','High','Low','Close','Volume','Close Time','Quote Asset Volume','Number of Trades','Taker buy base asset volume','Taker buy quote asset volume','Ignore']
 df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
@@ -405,12 +404,69 @@ df['High']=1/df['High'].astype(float)
 df['Low']=1/df['Low'].astype(float)
 df['Close']=1/df['Close'].astype(float)
 #create a candlestick chart
-
 fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
                 open=df['Open'],
                 high=df['High'],
                 low=df['Low'],
                 close=df['Close'])])
+fig.update_layout(
+    title='1 hours 30 bars',
+    # xaxis_title='X Axis Title',
+    # yaxis_title='Y Axis Title'
+)
+st.plotly_chart(fig, use_container_width=True
+                )
+
+
+# 4 hours klines
+x=spot_client.klines("ARBETH", "4h", limit=30)
+#convert to dateframe
+df=pd.DataFrame(x)
+df.columns=['Open Time','Open','High','Low','Close','Volume','Close Time','Quote Asset Volume','Number of Trades','Taker buy base asset volume','Taker buy quote asset volume','Ignore']
+df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
+df['Close Time'] = pd.to_datetime(df['Close Time'], unit='ms')
+#convert price data to 1/the actual price
+df['Open']=1/df['Open'].astype(float)
+df['High']=1/df['High'].astype(float)
+df['Low']=1/df['Low'].astype(float)
+df['Close']=1/df['Close'].astype(float)
+#create a candlestick chart
+fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
+                open=df['Open'],
+                high=df['High'],
+                low=df['Low'],
+                close=df['Close'])])
+fig.update_layout(
+    title='4 hours',
+    # xaxis_title='X Axis Title',
+    # yaxis_title='Y Axis Title'
+)
+st.plotly_chart(fig, use_container_width=True
+                )
+
+# 4 hours klines
+x=spot_client.klines("ARBETH", "1d", limit=30)
+#convert to dateframe
+df=pd.DataFrame(x)
+df.columns=['Open Time','Open','High','Low','Close','Volume','Close Time','Quote Asset Volume','Number of Trades','Taker buy base asset volume','Taker buy quote asset volume','Ignore']
+df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
+df['Close Time'] = pd.to_datetime(df['Close Time'], unit='ms')
+#convert price data to 1/the actual price
+df['Open']=1/df['Open'].astype(float)
+df['High']=1/df['High'].astype(float)
+df['Low']=1/df['Low'].astype(float)
+df['Close']=1/df['Close'].astype(float)
+#create a candlestick chart
+fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
+                open=df['Open'],
+                high=df['High'],
+                low=df['Low'],
+                close=df['Close'])])
+fig.update_layout(
+    title='1 day',
+    # xaxis_title='X Axis Title',
+    # yaxis_title='Y Axis Title'
+)
 st.plotly_chart(fig, use_container_width=True
                 )
 
