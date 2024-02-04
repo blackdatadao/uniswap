@@ -6,3 +6,5 @@ eth_abi
 numpy
 plotly
 requests
+logging
+binance-connector
