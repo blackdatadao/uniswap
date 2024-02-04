@@ -56,13 +56,7 @@ url='http://42.192.17.155/nft_list'
 response = requests.get(url)
 assert response.status_code==200
 nfts_list=response.json()
-        
-# with open('nfts_list.json') as f:
-#      nfts_list=json.load(f)
-
 nft_list=pd.DataFrame(nfts_list)
-
-
 #select the nfts which is open from the nft_list 
 df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
 
@@ -93,6 +87,7 @@ df3['symbol1_price']=df3['symbol1'].apply(lambda x: arbusdc_price if x=='ARB' el
 df3['symbol0_price']=ethusdc_price
 df3['fee_usdc']=df3['current_fee0']*df3['symbol0_price']+df3['current_fee1']*df3['symbol1_price']
 df3['value']=df3['withdrawable_tokens0']*df3['symbol0_price']+df3['withdrawable_tokens1']*df3['symbol1_price']
+
 df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration','current_price']]
 #convert time object of df3['create_time'] to time object with format '%m-%d %H:%M'
 df4['create_time']=df4['create_time'].map(lambda x:datetime.strptime(x,'%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M'))
@@ -379,6 +374,39 @@ st.plotly_chart(fig, use_container_width=True
                 )
 
 
+import logging
+from binance.spot import Spot as Client
+from binance.lib.utils import config_logging
+import pandas as pd
+from datetime import datetime
+import plotly.graph_objects as go
+
+config_logging(logging, logging.DEBUG)
+
+spot_client = Client(base_url="https://testnet.binance.vision")
+
+# logging.info(spot_client.klines("BTCUSDT", "1m"))
+x=spot_client.klines("ARBETH", "4h", limit=10)
+#convert to dateframe
+
+df=pd.DataFrame(x)
+df.columns=['Open Time','Open','High','Low','Close','Volume','Close Time','Quote Asset Volume','Number of Trades','Taker buy base asset volume','Taker buy quote asset volume','Ignore']
+df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
+df['Close Time'] = pd.to_datetime(df['Close Time'], unit='ms')
+#convert price data to 1/the actual price
+df['Open']=1/df['Open'].astype(float)
+df['High']=1/df['High'].astype(float)
+df['Low']=1/df['Low'].astype(float)
+df['Close']=1/df['Close'].astype(float)
+#create a candlestick chart
+
+fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
+                open=df['Open'],
+                high=df['High'],
+                low=df['Low'],
+                close=df['Close'])])
+st.plotly_chart(fig, use_container_width=True
+                )
 
 df=get_history_price_ethusdc(w3)
 timestamp_start=w3.eth.get_block(int(df['blockNumber'][0]))['timestamp']
