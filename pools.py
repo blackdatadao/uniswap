@@ -380,6 +380,7 @@ import pandas as pd
 from datetime import datetime
 import plotly.graph_objects as go
 
+<<<<<<< HEAD
 import logging
 from binance.spot import Spot as Client
 from binance.lib.utils import config_logging
@@ -387,6 +388,8 @@ import pandas as pd
 from datetime import datetime
 import plotly.graph_objects as go
 
+=======
+>>>>>>> 04d187d3a226bfb84f9258f0ba3b88c71d41de87
 config_logging(logging, logging.DEBUG)
 
 spot_client = Client(base_url="https://testnet.binance.vision")
