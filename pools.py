@@ -16,7 +16,7 @@ import plotly.express as px
 import requests
 
 from streamlit.components.v1 import iframe
-
+from binance_kline import get_kline_data_from_binance,reverse_price
 
 # pd.set_option("dispaly.float_format", "{:.1f}".format)
 
@@ -471,7 +471,36 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width=True
                 )
 
-# 4 hours klines
+# 1 hour  klines compare with the price of ethusdc
+
+ARBETH=get_kline_data_from_binance('ARBETH','1h',100)
+ETHARB=reverse_price(ARBETH)
+ETHUSDC=get_kline_data_from_binance('ETHUSDC','1h',100)
+#plot the price of ethusdc and etharb, one is on the left, the other is on the right
+fig = go.Figure()
+fig.add_trace(go.Candlestick(x=ETHUSDC['Open Time'],
+                open=ETHUSDC['Open'],
+                high=ETHUSDC['High'],
+                low=ETHUSDC['Low'],
+                close=ETHUSDC['Close'],name='ETH/USDC'))
+fig.add_trace(go.candlestick(x=ETHARB['Open Time'],
+                open=ETHARB['Open'],
+                high=ETHARB['High'],
+                low=ETHARB['Low'],
+                close=ETHARB['Close'],name='ETH/ARB',yaxis='y2'))
+fig.update_layout(
+    title='1 hours 100 bars',
+    # xaxis_title='X Axis Title',
+    # yaxis_title='Y Axis Title'
+)
+fig.update_yaxes(title_text="ETH/USDC", secondary_y=False)
+fig.update_yaxes(title_text="ETH/ARB", secondary_y=True)
+st.plotly_chart(fig, use_container_width=True
+                )
+
+
+# 1 hours ETH/USD klines
+
 x=spot_client.klines("ARBETH", "1d", limit=100)
 #convert to dateframe
 df=pd.DataFrame(x)
