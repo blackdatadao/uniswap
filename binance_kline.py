@@ -243,7 +243,7 @@ def plot_dual_axis_time_series_plotly_three(time, series1, series2, series3, lab
         plot_bgcolor='black', 
         paper_bgcolor='black',
         font=dict(color='white'),
-        legend=dict(font=dict(size=18, color="white"))
+        legend=dict(orientation="h", xanchor="center",yanchor="bottom",font=dict(size=18, color="white"))
     )
 
     # Set x-axis title
@@ -332,7 +332,8 @@ def plot_kline_data(kline_data, title):
         },
         plot_bgcolor='black',
         paper_bgcolor='black',
-        font=dict(color='white')
+        font=dict(color='white'),
+        height=600,
     )
 
     fig.update_xaxes(showgrid=False, showline=True, linewidth=2, linecolor='white', tickfont=dict(color='white'))
