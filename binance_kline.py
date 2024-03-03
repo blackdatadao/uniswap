@@ -187,7 +187,7 @@ def plot_dual_axis_time_series_plotly(time, series1, series2, label1='Series 1',
 
     # Add figure title
     fig.update_layout(
-        title_text={
+        title={
             'text': title,
             'font': {
                 'color': 'white'  
