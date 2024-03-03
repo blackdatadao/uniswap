@@ -102,7 +102,7 @@ def plot_price_comparison(price_1, price_2, price_1_name,price_2_name):
         paper_bgcolor='black',
         plot_bgcolor='black',
         font=dict(color='white'),
-        legend=dict(orientation="h", xanchor="center", yanchor="bottom", x=0.5, y=-0.5, font=dict(size=24, color="white"))
+        legend=dict(orientation="h", xanchor="center", yanchor="bottom", x=0.5, y=-0.8, font=dict(size=24, color="white"))
     )
 
     fig.update_xaxes(showgrid=False, showline=True, linewidth=2, linecolor='white', tickfont=dict(color='white'))
@@ -187,10 +187,17 @@ def plot_dual_axis_time_series_plotly(time, series1, series2, label1='Series 1',
 
     # Add figure title
     fig.update_layout(
-        title_text=title,
+        title_text={
+            'text': title,
+            'font': {
+                'color': 'white'  
+            }
+        },
         plot_bgcolor='black', 
         paper_bgcolor='black',
-        font=dict(color='white')
+        font=dict(color='white'),
+        legend=dict(font=dict(size=18, color="white"))
+
     )
 
     # Set x-axis title
@@ -307,7 +314,12 @@ def plot_kline_data(kline_data, title):
                                          close=kline_data['Close'])])
 
     fig.update_layout(
-        title=title,
+        title={
+            'text': title,
+            'font': {
+                'color': 'white'  
+            }
+        },
         plot_bgcolor='black',
         paper_bgcolor='black',
         font=dict(color='white')
@@ -319,6 +331,8 @@ def plot_kline_data(kline_data, title):
     return fig
 
 # ARBETH=get_kline_data_from_binance('ARBETH','1h',72)
+# plot_kline_data(ARBETH,'ARBETH').show()
+
 # ETHARB=reverse_price(ARBETH)
 # ETHUSDC=get_kline_data_from_binance('ETHUSDC','1h',72)
 
