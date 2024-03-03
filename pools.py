@@ -382,7 +382,12 @@ fig.update_layout(title='ETH/usdc price')
 st.plotly_chart(fig, use_container_width=True)
 
 #plot 1 hours klines of arbeth
-fig=get_kline_data_from_binance('ARBETH','1h',24)
+df=get_kline_data_from_binance('ARBETH','1h',24)
+fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
+                open=df['Open'],
+                high=df['High'],
+                low=df['Low'],
+                close=df['Close'])])
 st.plotly_chart(fig, use_container_width=True)
 
 #plot 4 hours klines of arbeth
