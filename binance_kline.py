@@ -21,10 +21,10 @@ def get_kline_data_from_binance(symbol, interval, limit):
     kline_data['High'] = kline_data['High'].astype(float)
     kline_data['Low'] = kline_data['Low'].astype(float)
     kline_data['Close'] = kline_data['Close'].astype(float)
-    # check if the high is greater than 20% of the average of the open and close, replace the high with the 130% of the average of the open and close
-    kline_data['High'] = kline_data.apply(lambda x: x['High'] if x['High'] < 1.2 * (x['Open']+x['Close'])/2 else 1.2 * (x['Open']+x['Close'])/2, axis=1)
+    # check if the high is greater than 10% of the average of the open and close, replace the high with the 110% of the average of the open and close
+    kline_data['High'] = kline_data.apply(lambda x: x['High'] if x['High'] < 1.05 * (x['Open']+x['Close'])/2 else 1.05 * (x['Open']+x['Close'])/2, axis=1)
     # check if the low is less than 70% of the average of the open and close, replace the low with the 70% of the average of the open and close
-    kline_data['Low'] = kline_data.apply(lambda x: x['Low'] if x['Low'] > 0.8 * (x['Open']+x['Close'])/2 else 0.8 * (x['Open']+x['Close'])/2, axis=1)
+    kline_data['Low'] = kline_data.apply(lambda x: x['Low'] if x['Low'] > 0.95 * (x['Open']+x['Close'])/2 else 0.95 * (x['Open']+x['Close'])/2, axis=1)
     #average price
     kline_data['average']=kline_data[['Open','High','Low','Close']].mean(axis=1)
     kline_data['normalized_average']=kline_data['average']/kline_data['average'].iloc[0]
@@ -370,8 +370,8 @@ def calculate_rolling_volatility(asset_df, n, price_column='Close'):
 # Assuming `asset_df` is your DataFrame with the price data
 # rolling_volatility = calculate_rolling_volatility(asset_df, 20)
 
-# ARBETH=get_kline_data_from_binance('ARBETH','1h',72)
-# plot_kline_data(ARBETH,'ARBETH').show()
+ARBETH=get_kline_data_from_binance('ETHUSDT','1h',72)
+plot_kline_data(ARBETH,'ARBETH').show()
 
 # ETHARB=reverse_price(ARBETH)
 # ETHUSDC=get_kline_data_from_binance('ETHUSDC','1h',72)
@@ -393,7 +393,7 @@ def calculate_rolling_volatility(asset_df, n, price_column='Close'):
 # fig=plot_dual_axis_time_series_plotly_three(ARBUSD['Open Time'],beta_series,ARBUSD['normalized_average'],ETHUSD['normalized_average'],label1='Beta',label2='ETH/ARB',label3='Correlation',axis1_name='Beta',axis2_name='ETH/ARB',axis3_name='Correlation',title='Rolling Beta vs ETH/ARB vs Correlation')
 
 # fig.show()
-# c=1
+c=1
 
 # from binance.spot import Spot
 
