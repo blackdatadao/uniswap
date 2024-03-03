@@ -21,6 +21,10 @@ def get_kline_data_from_binance(symbol, interval, limit):
     kline_data['High'] = kline_data['High'].astype(float)
     kline_data['Low'] = kline_data['Low'].astype(float)
     kline_data['Close'] = kline_data['Close'].astype(float)
+    # check if the high is greater than 20% of the average of the open and close, replace the high with the 130% of the average of the open and close
+    kline_data['High'] = kline_data.apply(lambda x: x['High'] if x['High'] < 1.2 * (x['open']+x['close'])/2 else 1.2 * (x['open']+x['close'])/2, axis=1)
+    # check if the low is less than 70% of the average of the open and close, replace the low with the 70% of the average of the open and close
+    kline_data['Low'] = kline_data.apply(lambda x: x['Low'] if x['Low'] > 0.8 * (x['open']+x['close'])/2 else 0.8 * (x['open']+x['close'])/2, axis=1)
     #average price
     kline_data['average']=kline_data[['Open','High','Low','Close']].mean(axis=1)
     kline_data['normalized_average']=kline_data['average']/kline_data['average'].iloc[0]
