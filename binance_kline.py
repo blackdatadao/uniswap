@@ -370,8 +370,8 @@ def calculate_rolling_volatility(asset_df, n, price_column='Close'):
 # Assuming `asset_df` is your DataFrame with the price data
 # rolling_volatility = calculate_rolling_volatility(asset_df, 20)
 
-ARBETH=get_kline_data_from_binance('ETHUSDT','1h',72)
-plot_kline_data(ARBETH,'ARBETH').show()
+# ARBETH=get_kline_data_from_binance('ETHUSDT','1h',72)
+# plot_kline_data(ARBETH,'ARBETH').show()
 
 # ETHARB=reverse_price(ARBETH)
 # ETHUSDC=get_kline_data_from_binance('ETHUSDC','1h',72)
