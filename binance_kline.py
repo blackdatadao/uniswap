@@ -291,6 +291,32 @@ def calculate_rolling_beta_and_correlation(asset_df, benchmark_df, n, price_colu
     
     return beta_series, correlation_series
 
+def plot_kline_data(kline_data, title):
+    """
+    Plots the price data for a single dataset as a candlestick chart.
+
+    Parameters:
+    - kline_data: DataFrame containing the price data to plot.
+    - title: String, the title of the plot.
+    """
+    
+    fig = go.Figure(data=[go.Candlestick(x=kline_data['Open Time'],
+                                         open=kline_data['Open'],
+                                         high=kline_data['High'],
+                                         low=kline_data['Low'],
+                                         close=kline_data['Close'])])
+
+    fig.update_layout(
+        title=title,
+        plot_bgcolor='black',
+        paper_bgcolor='black',
+        font=dict(color='white')
+    )
+
+    fig.update_xaxes(showgrid=False, showline=True, linewidth=2, linecolor='white', tickfont=dict(color='white'))
+    fig.update_yaxes(showgrid=False, showline=True, linewidth=2, linecolor='white', tickfont=dict(color='white'))
+
+    return fig
 
 # ARBETH=get_kline_data_from_binance('ARBETH','1h',72)
 # ETHARB=reverse_price(ARBETH)
