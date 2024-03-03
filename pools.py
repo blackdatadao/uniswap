@@ -16,7 +16,8 @@ import plotly.express as px
 import requests
 
 from streamlit.components.v1 import iframe
-from binance_kline import get_kline_data_from_binance,reverse_price
+from binance_kline import get_kline_data_from_binance,reverse_price,plot_price_comparison,plot_kline_data,calculate_rolling_beta,plot_dual_axis_time_series_plotly,calculate_rolling_beta_and_correlation,plot_dual_axis_time_series_plotly_three
+
 
 import logging
 from binance.spot import Spot as Client
@@ -382,47 +383,52 @@ fig.update_layout(title='ETH/usdc price')
 st.plotly_chart(fig, use_container_width=True)
 
 #plot 1 hours klines of arbeth
-df=get_kline_data_from_binance('ARBETH','1h',24)
-fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
-                open=df['Open'],
-                high=df['High'],
-                low=df['Low'],
-                close=df['Close'])])
+ARBETH=get_kline_data_from_binance('ARBETH','1h',24)
+ETHARB=reverse_price(ARBETH)
+fig=plot_kline_data(ETHARB,'ETH/ARB 1h klines')
 st.plotly_chart(fig, use_container_width=True)
 
 #plot 4 hours klines of arbeth
-df=get_kline_data_from_binance('ARBETH','4h',24)
-fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
-                open=df['Open'],
-                high=df['High'],
-                low=df['Low'],
-                close=df['Close'])])
-st.plotly_chart(fig, use_container_width=True
-                )
-
-# 1 hour  klines compare with the price of ethusdc
-
-# st.plotly_chart(fig, use_container_width=True
-#                 )
+ARBETH=get_kline_data_from_binance('ARBETH','4h',24)
+ETHARB=reverse_price(ARBETH)
+fig=plot_kline_data(ETHARB,'ETH/ARB 4h klines')
+st.plotly_chart(fig, use_container_width=True)
 
 # plot 1 hours ETH/USD klines
-df=get_kline_data_from_binance('ETHUSDT','1h',24)
-fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
-                open=df['Open'],
-                high=df['High'],
-                low=df['Low'],
-                close=df['Close'])])
+ETHUSD=get_kline_data_from_binance('ETHUSDT','1h',24)
+fig=plot_kline_data(ETHUSD,'ETH/USDT 1h klines')
 st.plotly_chart(fig, use_container_width=True)
 
 # plot 4 hours ETH/USD klines
-df=get_kline_data_from_binance('ETHUSDT','4h',24)
-fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
-                open=df['Open'],
-                high=df['High'],
-                low=df['Low'],
-                close=df['Close'])])
+ETHUSD=get_kline_data_from_binance('ETHUSDT','4h',24)
+fig=plot_kline_data(ETHUSD,'ETH/USDT 4h klines')
 st.plotly_chart(fig, use_container_width=True)
 
+# compare 1 hours ETH/USD and ETH/ARB klines with n hours
+n=100
+ETHARB=reverse_price(get_kline_data_from_binance('ARBETH','1h',n))
+ETHUSD=get_kline_data_from_binance('ETHUSDT','1h',n)
+fig=plot_price_comparison(ETHUSD,ETHARB,'ETH/USDT','ETH/ARB')
+st.plotly_chart(fig, use_container_width=True)
+
+# beta analysis
+n = 24  # Rolling window size
+m=336
+ARBUSD=get_kline_data_from_binance('ARBUSDT','1h',m)
+ETHUSD=get_kline_data_from_binance('ETHUSDC','1h',m)
+ARBETH=get_kline_data_from_binance('ARBETH','1h',m)
+ETHARB=reverse_price(ARBETH)
+beataserie=calculate_rolling_beta(ARBUSD,ETHUSD,n,price_column='average')
+beta_series, correlation_series = calculate_rolling_beta_and_correlation(ARBUSD, ETHUSD, n, 'Close')
+
+fig=plot_dual_axis_time_series_plotly(ETHUSD['Open Time'],beta_series,ETHARB['average'],label1='Beta',label2='ETH/ARB',axis1_name='Beta',axis2_name='ETH/ARB',title='Rolling Beta vs ETH/ARB')
+st.plotly_chart(fig, use_container_width=True)
+
+fig=plot_dual_axis_time_series_plotly(ETHUSD['Open Time'],beta_series,ETHUSD['average'],label1='Beta',label2='ETH/USD',axis1_name='Beta',axis2_name='ETH/USD',title='Rolling Beta vs ETH/USD')
+st.plotly_chart(fig, use_container_width=True)
+
+fig=plot_dual_axis_time_series_plotly_three(ARBUSD['Open Time'],beta_series,ARBUSD['normalized_average'],ETHUSD['normalized_average'],label1='Beta',label2='ETH/ARB',label3='ETH/USD',axis1_name='Beta',axis2_name='ARB/USD',axis3_name='ETH/USD',title='Rolling Beta vs ETH/ARB vs ETH/USD')
+st.plotly_chart(fig, use_container_width=True)
 
 iframe_url='https://dune.com/embeds/2272843/3725900'
 i_width=600
