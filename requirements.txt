@@ -9,6 +9,3 @@ requests
 binance-connector-python
 gql
 datetime
-math
-sys
-gql.transport.requests
