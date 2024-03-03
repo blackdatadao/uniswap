@@ -230,10 +230,16 @@ def plot_dual_axis_time_series_plotly_three(time, series1, series2, series3, lab
     )
     # Add figure title
     fig.update_layout(
-        title_text=title,
+        title={
+            'text': title,
+            'font': {
+                'color': 'white'  
+            }
+        },
         plot_bgcolor='black', 
         paper_bgcolor='black',
-        font=dict(color='white')
+        font=dict(color='white'),
+        legend=dict(font=dict(size=18, color="white"))
     )
 
     # Set x-axis title
@@ -329,6 +335,36 @@ def plot_kline_data(kline_data, title):
     fig.update_yaxes(showgrid=False, showline=True, linewidth=2, linecolor='white', tickfont=dict(color='white'))
 
     return fig
+
+import pandas as pd
+import numpy as np
+
+def calculate_rolling_volatility(asset_df, n, price_column='Close'):
+    """
+    Calculate rolling volatility for an asset.
+
+    Parameters:
+    - asset_df: DataFrame containing price data for the asset.
+    - n: The number of data points to use for each volatility calculation (rolling window size).
+    - price_column: The name of the column in the DataFrame that contains the price data.
+
+    Returns:
+    - A Pandas Series containing the volatility values for each data point based on the previous n data points.
+    """
+    
+    # Calculate daily returns for the asset
+    asset_returns = asset_df[price_column].pct_change()
+    
+    # Calculate rolling volatility using the standard deviation of returns
+    # multiplied by the square root of 252 to annualize it
+    rolling_volatility = asset_returns.rolling(window=n).std() * np.sqrt(365)
+    
+    # The rolling function automatically aligns the result with the original DataFrame's index
+    return rolling_volatility
+
+# Example usage
+# Assuming `asset_df` is your DataFrame with the price data
+# rolling_volatility = calculate_rolling_volatility(asset_df, 20)
 
 # ARBETH=get_kline_data_from_binance('ARBETH','1h',72)
 # plot_kline_data(ARBETH,'ARBETH').show()
