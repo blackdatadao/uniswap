@@ -422,19 +422,20 @@ beataserie=calculate_rolling_beta(ARBUSD,ETHUSD,n,price_column='average')
 beta_series, correlation_series = calculate_rolling_beta_and_correlation(ARBUSD, ETHUSD, n, 'Close')
 volatility_series_ETH=calculate_rolling_volatility(ETHUSD,n)
 volatility_series_ARB=calculate_rolling_volatility(ARBUSD,n)
-fig=plot_dual_axis_time_series_plotly(ETHUSD['Open Time'],beta_series,ETHARB['average'],label1='Beta',label2='ETH/ARB',axis1_name='Beta',axis2_name='ETH/ARB',title='Rolling Beta vs ETH/ARB')
-st.plotly_chart(fig, use_container_width=True)
 
-fig=plot_dual_axis_time_series_plotly(ETHUSD['Open Time'],beta_series,ETHUSD['average'],label1='Beta',label2='ETH/USD',axis1_name='Beta',axis2_name='ETH/USD',title='Rolling Beta vs ETH/USD')
-st.plotly_chart(fig, use_container_width=True)
+# fig=plot_dual_axis_time_series_plotly(ETHUSD['Open Time'],beta_series,ETHARB['average'],label1='Beta',label2='ETH/ARB',axis1_name='Beta',axis2_name='ETH/ARB',title='Rolling Beta vs ETH/ARB')
+# st.plotly_chart(fig, use_container_width=True)
+
+# fig=plot_dual_axis_time_series_plotly(ETHUSD['Open Time'],beta_series,ETHUSD['average'],label1='Beta',label2='ETH/USD',axis1_name='Beta',axis2_name='ETH/USD',title='Rolling Beta vs ETH/USD')
+# st.plotly_chart(fig, use_container_width=True)
 
 fig=plot_dual_axis_time_series_plotly_three(ARBUSD['Open Time'],beta_series,ARBUSD['normalized_average'],ETHUSD['normalized_average'],label1='Beta',label2='ETH/ARB',label3='ETH/USD',axis1_name='Beta',axis2_name='ARB/USD',axis3_name='ETH/USD',title='Rolling Beta vs ETH/ARB vs ETH/USD')
 st.plotly_chart(fig, use_container_width=True)
 
-fig=plot_dual_axis_time_series_plotly_three(ARBUSD['Open Time'],correlation_series,ARBUSD['normalized_average'],ETHUSD['normalized_average'],label1='corelation',label2='ETH/ARB',label3='ETH/USD',axis1_name='Beta',axis2_name='ARB/USD',axis3_name='ETH/USD',title='corealtion vs ARB/USD vs ETH/USD')
+fig=plot_dual_axis_time_series_plotly_three(ARBUSD['Open Time'],correlation_series,ARBUSD['normalized_average'],ETHUSD['normalized_average'],label1='corelation',label2='ETH/ARB',label3='ETH/USD',axis1_name='Corelation',axis2_name='ARB/USD',axis3_name='ETH/USD',title='corelation vs ARB/USD vs ETH/USD')
 st.plotly_chart(fig, use_container_width=True)
 
-fig=plot_dual_axis_time_series_plotly_three(ARBUSD['Open Time'],volatility_series_ETH,volatility_series_ARB,ETHUSD['normalized_average'],label1='ETH vol',label2='ARB vol',label3='ETH/USD',axis1_name='ETH vol',axis2_name='ARB vol',axis3_name='ETH/USD',title='volatility vs ARB/USD vs ETH/USD')
+fig=plot_dual_axis_time_series_plotly_three(ARBUSD['Open Time'],ETHUSD['normalized_average'],volatility_series_ETH,volatility_series_ARB,label1='ETH/USD',label2='ETH vol',label3='ARB vol',axis1_name='ETH/USD',axis2_name='ETH vol',axis3_name='ARB vol',title='volatility vs ARB/USD vs ETH/USD')
 st.plotly_chart(fig, use_container_width=True)
 
 iframe_url='https://dune.com/embeds/2272843/3725900'
