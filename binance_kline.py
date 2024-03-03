@@ -201,6 +201,7 @@ def plot_dual_axis_time_series_plotly(time, series1, series2, label1='Series 1',
         plot_bgcolor='black', 
         paper_bgcolor='black',
         font=dict(color='white'),
+        height=600,
         legend=dict(orientation="h", xanchor="center",yanchor="bottom",x=0.5, y=-0.5,font=dict(size=18, color="white"))
 
     )
@@ -244,6 +245,7 @@ def plot_dual_axis_time_series_plotly_three(time, series1, series2, series3, lab
         plot_bgcolor='black', 
         paper_bgcolor='black',
         font=dict(color='white'),
+        height=600,
         legend=dict(orientation="h", xanchor="center",yanchor="bottom",x=0.5, y=-0.5,font=dict(size=18, color="white"))
     )
 
@@ -334,7 +336,7 @@ def plot_kline_data(kline_data, title):
         plot_bgcolor='black',
         paper_bgcolor='black',
         font=dict(color='white'),
-        height=700,
+        height=600,
         xaxis_rangeslider_visible=False
     )
 

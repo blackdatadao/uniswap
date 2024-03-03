@@ -301,9 +301,9 @@ def get_pool_distribution():
     df = pd.DataFrame(list(tick_mapping.items()),columns = ['tick','liquidityNet'])
 
     #print the length of the amount_mapping
-    print(len(tick_mapping))
-    print(len(amount_mapping))
-    print((max_tick-min_tick)/tick_spacing+1)
+    # print(len(tick_mapping))
+    # print(len(amount_mapping))
+    # print((max_tick-min_tick)/tick_spacing+1)
 
     #convert amount_mapping to dataframe with columns tick,price,amount0,amount1
     df2 = pd.DataFrame(list(amount_mapping.items()),columns = ['tick','price'])
@@ -312,8 +312,8 @@ def get_pool_distribution():
     df2["price"]=df2["price"].map(lambda x: x[0])
 
     #extract the data from current_range_bottom_tick - 60 to current_range_bottom_tick + 60
-    left = df2[(df2['tick'] >= current_range_bottom_tick - 0) & (df2['tick'] <= current_range_bottom_tick+3000)]
-    right = df2[(df2['tick'] >= current_range_bottom_tick -3000) & (df2['tick'] <= current_range_bottom_tick-1)]
+    left = df2[(df2['tick'] >= current_range_bottom_tick - 0) & (df2['tick'] <= current_range_bottom_tick+1500)]
+    right = df2[(df2['tick'] >= current_range_bottom_tick -1500) & (df2['tick'] <= current_range_bottom_tick-1)]
     #plot 柱状图 and show the amount0 of df2,price is the x axis amount0 is the y axis
     #show the y axis value when hover
     # use plotly.graph_objects go
@@ -349,6 +349,9 @@ def get_pool_distribution():
     #     total_amount0 / 10 ** decimals0, token0, total_amount1 / 10 ** decimals1, token1))
 
     return total_amount0_,total_amount1_,current_price,fig_left,fig_right
+
+# total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
+# fig_left.show()
 
 # total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
 # fig_left.show()
