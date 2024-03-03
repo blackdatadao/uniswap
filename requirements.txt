@@ -9,3 +9,4 @@ requests
 binance-connector-python
 gql
 datetime
+requests_toolbelt
