@@ -106,7 +106,8 @@ def plot_price_comparison(price_1, price_2, price_1_name,price_2_name):
         paper_bgcolor='black',
         plot_bgcolor='black',
         font=dict(color='white'),
-        legend=dict(orientation="h", xanchor="center", yanchor="bottom", x=0.5, y=-0.8, font=dict(size=24, color="white"))
+        xaxis_rangeslider_visible=False,
+        legend=dict(orientation="h", xanchor="center", yanchor="bottom", x=0.5, y=-0.5, font=dict(size=24, color="white"))
     )
 
     fig.update_xaxes(showgrid=False, showline=True, linewidth=2, linecolor='white', tickfont=dict(color='white'))
@@ -200,7 +201,7 @@ def plot_dual_axis_time_series_plotly(time, series1, series2, label1='Series 1',
         plot_bgcolor='black', 
         paper_bgcolor='black',
         font=dict(color='white'),
-        legend=dict(font=dict(size=18, color="white"))
+        legend=dict(orientation="h", xanchor="center",yanchor="bottom",x=0.5, y=-0.5,font=dict(size=18, color="white"))
 
     )
 
@@ -243,7 +244,7 @@ def plot_dual_axis_time_series_plotly_three(time, series1, series2, series3, lab
         plot_bgcolor='black', 
         paper_bgcolor='black',
         font=dict(color='white'),
-        legend=dict(orientation="h", xanchor="center",yanchor="bottom",font=dict(size=18, color="white"))
+        legend=dict(orientation="h", xanchor="center",yanchor="bottom",x=0.5, y=-0.5,font=dict(size=18, color="white"))
     )
 
     # Set x-axis title
@@ -333,7 +334,8 @@ def plot_kline_data(kline_data, title):
         plot_bgcolor='black',
         paper_bgcolor='black',
         font=dict(color='white'),
-        height=600,
+        height=700,
+        xaxis_rangeslider_visible=False
     )
 
     fig.update_xaxes(showgrid=False, showline=True, linewidth=2, linecolor='white', tickfont=dict(color='white'))
