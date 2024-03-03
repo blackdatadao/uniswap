@@ -442,13 +442,6 @@ st.plotly_chart(fig, use_container_width=True)
 fig=get_volume_chart()
 st.plotly_chart(fig, use_container_width=True)
 
-total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
-st.markdown(f'**total amount0** {total_amount0_}')
-st.markdown(f'**total amount1** {total_amount1_}')
-st.markdown(f'**current price** {current_price}')
-st.plotly_chart(fig_left, use_container_width=True)
-st.plotly_chart(fig_right, use_container_width=True)
-
 
 iframe_url='https://dune.com/embeds/2272843/3725900'
 i_width=600
@@ -466,3 +459,10 @@ iframe(url_table_arb_price_vol, width=i_width, height=i_height, scrolling=True)
 
 url="https://info.uniswap.org/#/arbitrum/"
 st.markdown(f"[official data]({url})")
+
+total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
+st.markdown(f'**total amount0** {total_amount0_}')
+st.markdown(f'**total amount1** {total_amount1_}')
+st.markdown(f'**current price** {current_price}')
+st.plotly_chart(fig_left, use_container_width=True)
+st.plotly_chart(fig_right, use_container_width=True)
