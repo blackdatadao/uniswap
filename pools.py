@@ -18,8 +18,19 @@ import requests
 from streamlit.components.v1 import iframe
 from binance_kline import get_kline_data_from_binance,reverse_price
 
-# pd.set_option("dispaly.float_format", "{:.1f}".format)
+import logging
+from binance.spot import Spot as Client
+from binance.lib.utils import config_logging
+import pandas as pd
+from datetime import datetime
+import plotly.graph_objects as go
 
+import logging
+from binance.spot import Spot as Client
+from binance.lib.utils import config_logging
+import pandas as pd
+from datetime import datetime
+import plotly.graph_objects as go
 
 factory_address='0x1F98431c8aD98523631AE4a59f267346ea31F984'
 contract_address='0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
@@ -77,74 +88,6 @@ def get_pools_details(df):
             nft_data.append(result.result())
     
     return nft_data
-
-nft_data = get_pools_details(df)
-
-df3=pd.DataFrame(nft_data)
-#create a new column 'symbol1_price',if symbol1 is arb,then symbole1_price is the arbusdc_price,else is the 1
-df3['symbol1_price']=df3['symbol1'].apply(lambda x: arbusdc_price if x=='ARB' else 1)
-#create a new column 'symbol0_price',its value is ethusdc_price
-df3['symbol0_price']=ethusdc_price
-df3['fee_usdc']=df3['current_fee0']*df3['symbol0_price']+df3['current_fee1']*df3['symbol1_price']
-df3['value']=df3['withdrawable_tokens0']*df3['symbol0_price']+df3['withdrawable_tokens1']*df3['symbol1_price']
-
-df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration','current_price']]
-#convert time object of df3['create_time'] to time object with format '%m-%d %H:%M'
-df4['create_time']=df4['create_time'].map(lambda x:datetime.strptime(x,'%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M'))
-df4['tick_avg']=(df4['tick_lower']+df4['tick_upper'])/2
-#create new colomn which is fee_usdc/value/duration*24
-df4['apr']=df4['fee_usdc']/df4['value']/df4['duration']*24*100
-df4['return']=df4['fee_usdc']/df4['value']*100
-
-df4=df4.round(1)
-df4=df4.sort_values(by='nft_id',ascending=True)
-
-#select the data from df4 where current price in range of tick_lower and tick_upper
-df_inrange=df4[(df4['current_price']>=df4['tick_lower'])&(df4['current_price']<=df4['tick_upper'])]
-# select the data from df4 where current price is not in range of tick_lower and tick_upper
-df_outrange=df4[(df4['current_price']<df4['tick_lower'])|(df4['current_price']>df4['tick_upper'])]
-
-def get_summary(df):
-    df_balance=df.groupby(['symbol0','symbol1'])[['withdrawable_tokens0','withdrawable_tokens1']].sum()
-    df_create=df.groupby(['symbol0','symbol1'])[['create_token0','create_token1']].sum()
-    df_fee=df.groupby(['symbol0','symbol1'])[['fee_usdc']].sum()
-    df_value=df.groupby(['symbol0','symbol1'])[['value']].sum()
-    #combine df_balance,df_create,df_fee,df_value
-    df_summary=pd.concat([df_balance,df_create,df_fee,df_value],axis=1)
-    df_summary['token0_delta']=df_summary['withdrawable_tokens0']-df_summary['create_token0']
-    df_summary['token1_delta']=df_summary['withdrawable_tokens1']-df_summary['create_token1']
-    df_summary['average_cost']=df_summary['token1_delta']/df_summary['token0_delta']
-    df_summary=df_summary.applymap(lambda x:round(x,1) if isinstance(x,float) else x)
-    df_summary.columns=['w0','w1','c0','c1','fee','value','delta0','delta1','cost']
-    return df_summary
-
-
-summary_inrange=get_summary(df_inrange)
-summary_outrange=get_summary(df_outrange)
-summary=get_summary(df4)
-
-# create a stremlit table with title
-st.markdown('total summary')
-st.dataframe(summary.round(1))
-st.markdown('total summary inrange')
-st.dataframe(summary_inrange)
-st.markdown('total summary outrange')
-st.dataframe(summary_outrange)
-
-
-for index,row in df4.iterrows():
-    with st.container():
-        color = "green" if row['tick_lower'] < row['current_price'] and row['tick_upper'] > row['current_price'] else "black"
-        st.markdown(f'<span style="color: {color};"><strong>{row["symbol0"]}/{row["symbol1"]} < {row["tick_lower"]}-{row["tick_upper"]}></strong>@{row["tick_avg"]}  |  **Create:** {row["create_token0"]}/{row["create_token1"]} @{row["create_time"]}|{row["duration"]}H **#** {row["nft_id"]}</span>', unsafe_allow_html=True)
-        st.markdown(f'<span style="color: {color};"><strong>**Fee** {row["fee_usdc"]}</strong> < {row["withdrawable_tokens0"]}|{row["withdrawable_tokens1"]}> **value** {row["value"]} | {row["return"]} % **day** {row["apr"]} %</span>', unsafe_allow_html=True)
-
-#         st.markdown(f'<span style="color: {color};"><strong>**NFT ID:** {row["nft_id"]}</strong> | **Tick Upper:** {row["tick_upper"]} | **Tick Lower:** {row["tick_lower"]} | **Symbol0:** {row["symbol0"]} | **Symbol1:** {row["symbol1"]} | **Create Token0:** {row["create_token0"]} | **Create Token1:** {row["create_token1"]}</span>', unsafe_allow_html=True)
-#         st.markdown('**ID** '+str(row['nft_id'])+'  '+row['symbol0']+'/'+row['symbol1']+'<'+str(row['tick_lower'])+'-'+str(row['tick_upper'])+'>'+'<'+str(row['tick_avg'])+'>'+' **Duration:** '+str(row['duration'])+'mins'+' '+row['create_time'])    
-#         st.markdown('**Token0:** '+str(row['create_token0'])+' **Token1:** '+str(row['create_token1'])+' **Withdrawable0:** '+str(row['withdrawable_tokens0'])+' **Withdrawable1:** '+str(row['withdrawable_tokens1'])+' **Fee:** '+str(row['fee_usdc'])+' **Value:** '+str(row['value'])+' **APR:** '+str(row['apr'])+'%')  
-        st.write('---')
-
-# st.table(df4)
-
 
 def get_current_price_etharb(
         connection
@@ -352,8 +295,61 @@ def get_swap_price_ethusdc(
     else:
         raise Exception('fetched None')
 
+def get_summary(df):
+    df_balance=df.groupby(['symbol0','symbol1'])[['withdrawable_tokens0','withdrawable_tokens1']].sum()
+    df_create=df.groupby(['symbol0','symbol1'])[['create_token0','create_token1']].sum()
+    df_fee=df.groupby(['symbol0','symbol1'])[['fee_usdc']].sum()
+    df_value=df.groupby(['symbol0','symbol1'])[['value']].sum()
+    #combine df_balance,df_create,df_fee,df_value
+    df_summary=pd.concat([df_balance,df_create,df_fee,df_value],axis=1)
+    df_summary['token0_delta']=df_summary['withdrawable_tokens0']-df_summary['create_token0']
+    df_summary['token1_delta']=df_summary['withdrawable_tokens1']-df_summary['create_token1']
+    df_summary['average_cost']=df_summary['token1_delta']/df_summary['token0_delta']
+    df_summary=df_summary.applymap(lambda x:round(x,1) if isinstance(x,float) else x)
+    df_summary.columns=['w0','w1','c0','c1','fee','value','delta0','delta1','cost']
+    return df_summary
+
+# summary tabel 
+nft_data = get_pools_details(df)
+df3=pd.DataFrame(nft_data)
+#create a new column 'symbol1_price',if symbol1 is arb,then symbole1_price is the arbusdc_price,else is the 1
+df3['symbol1_price']=df3['symbol1'].apply(lambda x: arbusdc_price if x=='ARB' else 1)
+#create a new column 'symbol0_price',its value is ethusdc_price
+df3['symbol0_price']=ethusdc_price
+df3['fee_usdc']=df3['current_fee0']*df3['symbol0_price']+df3['current_fee1']*df3['symbol1_price']
+df3['value']=df3['withdrawable_tokens0']*df3['symbol0_price']+df3['withdrawable_tokens1']*df3['symbol1_price']
+
+df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration','current_price']]
+#convert time object of df3['create_time'] to time object with format '%m-%d %H:%M'
+df4['create_time']=df4['create_time'].map(lambda x:datetime.strptime(x,'%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M'))
+df4['tick_avg']=(df4['tick_lower']+df4['tick_upper'])/2
+#create new colomn which is fee_usdc/value/duration*24
+df4['apr']=df4['fee_usdc']/df4['value']/df4['duration']*24*100
+df4['return']=df4['fee_usdc']/df4['value']*100
+df4=df4.round(1)
+df4=df4.sort_values(by='nft_id',ascending=True)
+#select the data from df4 where current price in range of tick_lower and tick_upper
+df_inrange=df4[(df4['current_price']>=df4['tick_lower'])&(df4['current_price']<=df4['tick_upper'])]
+# select the data from df4 where current price is not in range of tick_lower and tick_upper
+df_outrange=df4[(df4['current_price']<df4['tick_lower'])|(df4['current_price']>df4['tick_upper'])]
+summary_inrange=get_summary(df_inrange)
+summary_outrange=get_summary(df_outrange)
+summary=get_summary(df4)
+
+st.markdown('total summary')
+st.dataframe(summary.round(1))
+st.markdown('total summary inrange')
+st.dataframe(summary_inrange)
+st.markdown('total summary outrange')
+st.dataframe(summary_outrange)
+for index,row in df4.iterrows():
+    with st.container():
+        color = "green" if row['tick_lower'] < row['current_price'] and row['tick_upper'] > row['current_price'] else "black"
+        st.markdown(f'<span style="color: {color};"><strong>{row["symbol0"]}/{row["symbol1"]} < {row["tick_lower"]}-{row["tick_upper"]}></strong>@{row["tick_avg"]}  |  **Create:** {row["create_token0"]}/{row["create_token1"]} @{row["create_time"]}|{row["duration"]}H **#** {row["nft_id"]}</span>', unsafe_allow_html=True)
+        st.markdown(f'<span style="color: {color};"><strong>**Fee** {row["fee_usdc"]}</strong> < {row["withdrawable_tokens0"]}|{row["withdrawable_tokens1"]}> **value** {row["value"]} | {row["return"]} % **day** {row["apr"]} %</span>', unsafe_allow_html=True)
 
 
+#plot the history price of etharb and ethusdc
 df=get_history_price_etharb(w3)
 timestamp_start=w3.eth.get_block(int(df['blockNumber'][0]))['timestamp']
 timestamp_end=w3.eth.get_block(int(df['blockNumber'].tail(1)))['timestamp']
@@ -364,165 +360,9 @@ y_min = df["price0"].mean() - 5 * df["price0"].std()
 y_max = df["price0"].mean() + 5 * df["price0"].std()
 price_median = df["price0"].median()
 df["price0"] = df["price0"].apply(lambda x: price_median if x < y_min or x > y_max else x)
-
-
 fig=px.line(df,x='blockNumber',y='price0',title=' end time: '+time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_end)))
 fig.update_xaxes(tickmode='array',tickvals=tick_values, ticktext=tick_labels)
 fig.update_layout(title='ETH/arb price')
-# fig.update_yaxes(range=[y_min, y_max])
-st.plotly_chart(fig, use_container_width=True
-                )
-
-import logging
-from binance.spot import Spot as Client
-from binance.lib.utils import config_logging
-import pandas as pd
-from datetime import datetime
-import plotly.graph_objects as go
-
-import logging
-from binance.spot import Spot as Client
-from binance.lib.utils import config_logging
-import pandas as pd
-from datetime import datetime
-import plotly.graph_objects as go
-
-config_logging(logging, logging.DEBUG)
-
-spot_client = Client(base_url="https://testnet.binance.vision")
-
-# # 1 minutes klines
-# x=spot_client.klines("ARBETH", "1m", limit=240)
-# #convert to dateframe
-# df=pd.DataFrame(x)
-# df.columns=['Open Time','Open','High','Low','Close','Volume','Close Time','Quote Asset Volume','Number of Trades','Taker buy base asset volume','Taker buy quote asset volume','Ignore']
-# df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
-# df['Close Time'] = pd.to_datetime(df['Close Time'], unit='ms')
-# #convert price data to 1/the actual price
-# df['Open']=1/df['Open'].astype(float)
-# df['High']=1/df['High'].astype(float)
-# df['Low']=1/df['Low'].astype(float)
-# df['Close']=1/df['Close'].astype(float)
-# #create a candlestick chart
-# fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
-#                 open=df['Open'],
-#                 high=df['High'],
-#                 low=df['Low'],
-#                 close=df['Close'])])
-# fig.update_layout(
-#     title='1 minutes 240 bars',
-#     # xaxis_title='X Axis Title',
-#     # yaxis_title='Y Axis Title'
-# )
-# st.plotly_chart(fig, use_container_width=True
-#                 )
-
-
-# 1 hours klines
-x=spot_client.klines("ARBETH", "1h", limit=24)
-#convert to dateframe
-df=pd.DataFrame(x)
-df.columns=['Open Time','Open','High','Low','Close','Volume','Close Time','Quote Asset Volume','Number of Trades','Taker buy base asset volume','Taker buy quote asset volume','Ignore']
-df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
-df['Close Time'] = pd.to_datetime(df['Close Time'], unit='ms')
-#convert price data to 1/the actual price
-df['Open']=1/df['Open'].astype(float)
-df['High']=1/df['High'].astype(float)
-df['Low']=1/df['Low'].astype(float)
-df['Close']=1/df['Close'].astype(float)
-#create a candlestick chart
-fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
-                open=df['Open'],
-                high=df['High'],
-                low=df['Low'],
-                close=df['Close'])])
-fig.update_layout(
-    title='1 hours 24 bars',
-    # xaxis_title='X Axis Title',
-    # yaxis_title='Y Axis Title'
-)
-st.plotly_chart(fig, use_container_width=True
-                )
-
-
-# 4 hours klines
-x=spot_client.klines("ARBETH", "4h", limit=24)
-#convert to dateframe
-df=pd.DataFrame(x)
-df.columns=['Open Time','Open','High','Low','Close','Volume','Close Time','Quote Asset Volume','Number of Trades','Taker buy base asset volume','Taker buy quote asset volume','Ignore']
-df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
-df['Close Time'] = pd.to_datetime(df['Close Time'], unit='ms')
-#convert price data to 1/the actual price
-df['Open']=1/df['Open'].astype(float)
-df['High']=1/df['High'].astype(float)
-df['Low']=1/df['Low'].astype(float)
-df['Close']=1/df['Close'].astype(float)
-#create a candlestick chart
-fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
-                open=df['Open'],
-                high=df['High'],
-                low=df['Low'],
-                close=df['Close'])])
-fig.update_layout(
-    title='4 hours',
-    # xaxis_title='X Axis Title',
-    # yaxis_title='Y Axis Title'
-)
-st.plotly_chart(fig, use_container_width=True
-                )
-
-# 1 hour  klines compare with the price of ethusdc
-
-ARBETH=get_kline_data_from_binance('ARBETH','1h',100)
-ETHARB=reverse_price(ARBETH)
-ETHUSDC=get_kline_data_from_binance('ETHUSDC','1h',100)
-#plot the price of ethusdc and etharb, one is on the left, the other is on the right
-fig = go.Figure()
-fig.add_trace(go.Candlestick(x=ETHUSDC['Open Time'],
-                open=ETHUSDC['Open'],
-                high=ETHUSDC['High'],
-                low=ETHUSDC['Low'],
-                close=ETHUSDC['Close'],name='ETH/USDC'))
-fig.add_trace(go.candlestick(x=ETHARB['Open Time'],
-                open=ETHARB['Open'],
-                high=ETHARB['High'],
-                low=ETHARB['Low'],
-                close=ETHARB['Close'],name='ETH/ARB',yaxis='y2'))
-fig.update_layout(
-    title='1 hours 100 bars',
-    # xaxis_title='X Axis Title',
-    # yaxis_title='Y Axis Title'
-)
-fig.update_yaxes(title_text="ETH/USDC", secondary_y=False)
-fig.update_yaxes(title_text="ETH/ARB", secondary_y=True)
-st.plotly_chart(fig, use_container_width=True
-                )
-
-
-# 1 hours ETH/USD klines
-
-x=spot_client.klines("ARBETH", "1d", limit=100)
-#convert to dateframe
-df=pd.DataFrame(x)
-df.columns=['Open Time','Open','High','Low','Close','Volume','Close Time','Quote Asset Volume','Number of Trades','Taker buy base asset volume','Taker buy quote asset volume','Ignore']
-df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
-df['Close Time'] = pd.to_datetime(df['Close Time'], unit='ms')
-#convert price data to 1/the actual price
-df['Open']=1/df['Open'].astype(float)
-df['High']=1/df['High'].astype(float)
-df['Low']=1/df['Low'].astype(float)
-df['Close']=1/df['Close'].astype(float)
-#create a candlestick chart
-fig = go.Figure(data=[go.Candlestick(x=df['Open Time'],
-                open=df['Open'],
-                high=df['High'],
-                low=df['Low'],
-                close=df['Close'])])
-fig.update_layout(
-    title='1 day',
-    # xaxis_title='X Axis Title',
-    # yaxis_title='Y Axis Title'
-)
 st.plotly_chart(fig, use_container_width=True
                 )
 
@@ -536,14 +376,34 @@ y_min = df["price0"].mean() - 5 * df["price0"].std()
 y_max = df["price0"].mean() + 5 * df["price0"].std()
 price_median = df["price0"].median()
 df["price0"] = df["price0"].apply(lambda x: price_median if x < y_min or x > y_max else x)
-
-
 fig=px.line(df,x='blockNumber',y='price0',title=' end time: '+time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_end)))
 fig.update_xaxes(tickmode='array',tickvals=tick_values, ticktext=tick_labels)
 fig.update_layout(title='ETH/usdc price')
-# fig.update_yaxes(range=[y_min, y_max])
+st.plotly_chart(fig, use_container_width=True)
+
+#plot 1 hours klines of arbeth
+fig=get_kline_data_from_binance('ARBETH','1h',24)
 st.plotly_chart(fig, use_container_width=True
                 )
+
+#plot 4 hours klines of arbeth
+fig=get_kline_data_from_binance('ARBETH','4h',24)
+st.plotly_chart(fig, use_container_width=True
+                )
+
+# 1 hour  klines compare with the price of ethusdc
+
+# st.plotly_chart(fig, use_container_width=True
+#                 )
+
+# plot 1 hours ETH/USD klines
+fig=get_kline_data_from_binance('ETHUSDT','1h',24)
+st.plotly_chart(fig, use_container_width=True)
+
+# plot 4 hours ETH/USD klines
+fig=get_kline_data_from_binance('ETHUSDT','4h',24)
+st.plotly_chart(fig, use_container_width=True)
+
 
 iframe_url='https://dune.com/embeds/2272843/3725900'
 i_width=600
