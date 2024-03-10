@@ -398,7 +398,7 @@ def calculate_rolling_volatility(asset_df, n, price_column='Close'):
 # fig=plot_dual_axis_time_series_plotly_three(ARBUSD['Open Time'],beta_series,ARBUSD['normalized_average'],ETHUSD['normalized_average'],label1='Beta',label2='ETH/ARB',label3='Correlation',axis1_name='Beta',axis2_name='ETH/ARB',axis3_name='Correlation',title='Rolling Beta vs ETH/ARB vs Correlation')
 
 # fig.show()
-c=1
+# c=1
 
 # from binance.spot import Spot
 
