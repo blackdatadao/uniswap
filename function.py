@@ -731,35 +731,35 @@ def update_nft_data(w3,factory_contract,current_price):
 
 # the intial parameters
 
-factory_address='0x1F98431c8aD98523631AE4a59f267346ea31F984'
-contract_address='0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
-provider_arb='https://arb1.arbitrum.io/rpc'
-provider_arb_2='https://arbitrum-mainnet.infura.io/v3/02040948aa024dc49e8730607e0caece'
+# factory_address='0x1F98431c8aD98523631AE4a59f267346ea31F984'
+# contract_address='0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
+# provider_arb='https://arb1.arbitrum.io/rpc'
+# provider_arb_2='https://arbitrum-mainnet.infura.io/v3/02040948aa024dc49e8730607e0caece'
 
-w3=Web3(HTTPProvider(provider_arb_2, {'timeout': 20}))
+# w3=Web3(HTTPProvider(provider_arb_2, {'timeout': 20}))
 
-with open(r"arbitrum nft position manager v3 ABI.json") as json_file:
-        contract_abi = json.load(json_file)
-nft_position_manager=w3.eth.contract(
-    address=Web3.to_checksum_address(contract_address.lower()),abi=contract_abi)
+# with open(r"arbitrum nft position manager v3 ABI.json") as json_file:
+#         contract_abi = json.load(json_file)
+# nft_position_manager=w3.eth.contract(
+#     address=Web3.to_checksum_address(contract_address.lower()),abi=contract_abi)
 
-with open(r"factory abi.json") as json_file:
-        factory_abi = json.load(json_file)
-factory_contract=w3.eth.contract(address=Web3.to_checksum_address(factory_address.lower()),abi=factory_abi)
-wallet_address='0x9742499f4f1464c5b3dbf4d04adcbc977fbf7baa'
+# with open(r"factory abi.json") as json_file:
+#         factory_abi = json.load(json_file)
+# factory_contract=w3.eth.contract(address=Web3.to_checksum_address(factory_address.lower()),abi=factory_abi)
+# wallet_address='0x9742499f4f1464c5b3dbf4d04adcbc977fbf7baa'
 
 
-try:
-    update_nft_list(wallet_address,w3,nft_position_manager)
-except:
-    print('error,retry...')
-    update_nft_list(wallet_address,w3,nft_position_manager)
-print('update nft_list finished,wallet address ',wallet_address)
+# try:
+#     update_nft_list(wallet_address,w3,nft_position_manager)
+# except:
+#     print('error,retry...')
+#     update_nft_list(wallet_address,w3,nft_position_manager)
+# print('update nft_list finished,wallet address ',wallet_address)
 
-current_price=get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
-nft=get_nft_data_since_last_index(w3,nft_position_manager,factory_contract,current_price,291)
-# 240 missed
-c=1
+# current_price=get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
+# nft=get_nft_data_since_last_index(w3,nft_position_manager,factory_contract,current_price,291)
+# # 240 missed
+# c=1
 # #update nft_list of a address
 # try:
 #     update_nft_list(wallet_address,w3,nft_position_manager)
