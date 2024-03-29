@@ -24,6 +24,12 @@ import requests
 
 #create a function to convert uniswap v3 tick to price
 
+def timestamp_to_time(timestamp):
+    return time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp))
+
+
+
+    
 
 def tick_to_price(tick,decimals_token0,decimals_token1):
     """convert uniswap v3 tick to price 1 token1=price token0"""
@@ -620,7 +626,7 @@ def get_all_nft_data(w3,nft_position_manager,factory_contract,current_price):
         
         output=get_output_by_nft_id(nft_id,current_price,w3,factory_contract,nft_position_manager)
         nft_data.append(output)
-        with open (r'D:\app\uniswap_bot\nft_data.json','w') as f:
+        with open (r'nft_data.json','w') as f:
             json.dump(nft_data,f)
         print(nft['index'],'...get data finished')
     return nft_data
@@ -637,13 +643,13 @@ def get_nft_data_since_last_index(w3,nft_position_manager,factory_contract,curre
         with open('nft_data.json') as f:
             nft_data = json.load(f)
     index=last_index
-    while index<nft_list_len:
+    while index<=nft_list_len:
         nft_id=nft_list_df[nft_list_df['index']==index]['nft_id'].values[0]
-        output=get_output_by_nft_id(int(nft_id),current_price,w3,factory_contract,nft_position_manager)
+        output=get_output_by_nft_id(int(nft_id),w3,factory_contract,nft_position_manager)
         #contact output and nft['index'] to get the new output
         output=dict(output,**{'index':index})
         nft_data.append(output)
-        with open (r'D:\app\uniswap_bot\nft_data.json','w') as f:
+        with open (r'nft_data.json','w') as f:
             json.dump(nft_data,f)       
         print(index,'...nft data finished')
         index=index+1
@@ -693,8 +699,9 @@ def update_nft_list(wallet_address,w3,nft_position_manager):
     #save nft_list to json file
     # update_time=time.strftime("%Y_%m_%d_%H_%M_%S",time.time())
     send_data_to_server(nfts_list)
-#     with open('nfts_list.json', 'w') as f:
-#         json.dump(nfts_list, f)
+    #dont delete below
+    # with open('nfts_list.json', 'w') as f:
+    #     json.dump(nfts_list, f)
 
 def update_nft_data(w3,factory_contract,current_price):
     with open('nfts_list.json') as f:
@@ -722,25 +729,37 @@ def update_nft_data(w3,factory_contract,current_price):
             nft_data=update_nft_data(w3,factory_contract,current_price,last_index)
     return nft_data
 
-# # the intial parameters
-# factory_address='0x1F98431c8aD98523631AE4a59f267346ea31F984'
-# contract_address='0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
-# provider_arb='https://arb1.arbitrum.io/rpc'
-# provider_arb_2='https://arbitrum-mainnet.infura.io/v3/02040948aa024dc49e8730607e0caece'
+# the intial parameters
 
-# w3=Web3(HTTPProvider(provider_arb_2, {'timeout': 20}))
+factory_address='0x1F98431c8aD98523631AE4a59f267346ea31F984'
+contract_address='0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
+provider_arb='https://arb1.arbitrum.io/rpc'
+provider_arb_2='https://arbitrum-mainnet.infura.io/v3/02040948aa024dc49e8730607e0caece'
 
-# with open(r"D:\app\uniswap_bot\arbitrum nft position manager v3 ABI.json") as json_file:
-#         contract_abi = json.load(json_file)
-# nft_position_manager=w3.eth.contract(
-#     address=Web3.to_checksum_address(contract_address.lower()),abi=contract_abi)
+w3=Web3(HTTPProvider(provider_arb_2, {'timeout': 20}))
 
-# with open(r"D:\app\uniswap_bot\factory ABI.json") as json_file:
-#         factory_abi = json.load(json_file)
-# factory_contract=w3.eth.contract(address=Web3.to_checksum_address(factory_address.lower()),abi=factory_abi)
-# wallet_address='0x9742499f4f1464c5b3dbf4d04adcbc977fbf7baa'
+with open(r"arbitrum nft position manager v3 ABI.json") as json_file:
+        contract_abi = json.load(json_file)
+nft_position_manager=w3.eth.contract(
+    address=Web3.to_checksum_address(contract_address.lower()),abi=contract_abi)
 
-# c=1
+with open(r"factory abi.json") as json_file:
+        factory_abi = json.load(json_file)
+factory_contract=w3.eth.contract(address=Web3.to_checksum_address(factory_address.lower()),abi=factory_abi)
+wallet_address='0x9742499f4f1464c5b3dbf4d04adcbc977fbf7baa'
+
+
+try:
+    update_nft_list(wallet_address,w3,nft_position_manager)
+except:
+    print('error,retry...')
+    update_nft_list(wallet_address,w3,nft_position_manager)
+print('update nft_list finished,wallet address ',wallet_address)
+
+current_price=get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
+nft=get_nft_data_since_last_index(w3,nft_position_manager,factory_contract,current_price,291)
+# 240 missed
+c=1
 # #update nft_list of a address
 # try:
 #     update_nft_list(wallet_address,w3,nft_position_manager)

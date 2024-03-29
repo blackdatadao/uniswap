@@ -371,6 +371,8 @@ def calculate_rolling_volatility(asset_df, n, price_column='Close'):
     # The rolling function automatically aligns the result with the original DataFrame's index
     return rolling_volatility
 
+
+
 # Example usage
 # Assuming `asset_df` is your DataFrame with the price data
 # rolling_volatility = calculate_rolling_volatility(asset_df, 20)

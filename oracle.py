@@ -46,9 +46,9 @@ def calculate_value(percent_change_list):
     return value
 def getbeck_change(i,change):
     return change[i:i+n+observe].tolist()
-# target=ethusd=get_kline_data_from_binance('ETHUSDT','1h',55)
+target0=get_kline_data_from_binance('ETHUSDC','1h',55)
 # target.to_csv('target.csv')
-target0 = pd.read_csv('target.csv')
+# target0 = pd.read_csv('target.csv')
 # plot_kline_data(target0,"ETHUSDT").show()
 target0['percentage_change'] = target0['Close'].pct_change()
 target = target0['percentage_change'][1:n+1]

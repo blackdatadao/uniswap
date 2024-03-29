@@ -13,7 +13,7 @@ import concurrent.futures
 from eth_abi import decode
 import numpy as np
 import plotly.express as px
-import requests
+import requests,os
 
 from streamlit.components.v1 import iframe
 from binance_kline import get_kline_data_from_binance,reverse_price,plot_price_comparison,plot_kline_data,calculate_rolling_beta,plot_dual_axis_time_series_plotly,calculate_rolling_beta_and_correlation,plot_dual_axis_time_series_plotly_three,calculate_rolling_volatility
@@ -350,6 +350,32 @@ for index,row in df4.iterrows():
         st.markdown(f'<span style="color: {color};"><strong>{row["symbol0"]}/{row["symbol1"]} < {row["tick_lower"]}-{row["tick_upper"]}></strong>@{row["tick_avg"]}  |  **Create:** {row["create_token0"]}/{row["create_token1"]} @{row["create_time"]}|{row["duration"]}H **#** {row["nft_id"]}</span>', unsafe_allow_html=True)
         st.markdown(f'<span style="color: {color};"><strong>**Fee** {row["fee_usdc"]}</strong> < {row["withdrawable_tokens0"]}|{row["withdrawable_tokens1"]}> **value** {row["value"]} | {row["return"]} % **day** {row["apr"]} %</span>', unsafe_allow_html=True)
 
+
+
+
+# Streamlit UI to input an integer
+user_input = st.number_input('Enter an integer', step=1, format='%d')
+
+# Button to append the input to the list and save it
+if st.button('Save Integer'):
+    json_file_path = 'realized_id.json'
+
+    if os.path.exists(json_file_path):
+        # Open the JSON file and load the data
+        with open(json_file_path, 'r') as file:
+            data = json.load(file)
+    else:
+        # If the file does not exist, start with an empty list
+        data = []
+    # Append the user input to the list
+    data.append(user_input)
+    
+    # Open the JSON file in write mode and save the data
+    with open(json_file_path, 'w') as file:
+        json.dump(data, file)
+        
+    st.success('realised ID saved successfully!')
+    
 
 #plot the history price of etharb and ethusdc
 df=get_history_price_etharb(w3)
