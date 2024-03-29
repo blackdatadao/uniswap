@@ -324,7 +324,8 @@ def send_id_to_server(user_input):
                 # POST request to send the updated list back to the server
                 post_response = requests.post(url, json=data, headers=headers)
                 post_response.raise_for_status()  # Check for HTTP errors
-                st.success("Data successfully sent to server.")
+                
+                st.session_state.show_success = True
         else:
             st.error('Error:', response.status_code)
     except json.JSONDecodeError:
@@ -375,11 +376,22 @@ for index,row in df4.iterrows():
 
 
 
-
+if 'show_success' not in st.session_state:
+    st.session_state.show_success = False
 # Streamlit UI to input realised ID
 user_input = st.number_input('Enter realised id', step=1, format='%d')
-send_id_to_server(user_input)
-st.success('realised ID saved successfully!')
+if st.button('Save Integer', on_click=send_id_to_server(user_input)):
+    # This block is intentionally left empty
+    # The button click triggers the save_integer function
+    pass
+
+# Conditional display of the success message based on session state
+if st.session_state.show_success:
+    st.success("Data successfully sent to server.")
+    # Reset the flag so the message doesn't show again after a refresh or another action
+    st.session_state.show_success = False
+    
+
 
 
 #plot the history price of etharb and ethusdc
