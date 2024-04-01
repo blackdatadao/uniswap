@@ -326,7 +326,8 @@ def send_id_to_server(user_input):
                 post_response.raise_for_status()  # Check for HTTP errors
                 
                 # st.session_state.show_success = True
-                success = st.success("Data successfully sent to server.")
+
+                success = st.success(f"{user_input} successfully sent to server.")
                 time.sleep(3)
                 success.empty() # Clear the alert
         else:
@@ -383,10 +384,14 @@ for index,row in df4.iterrows():
 #     st.session_state.show_success = False
 # Streamlit UI to input realised ID
 user_input = st.number_input('Enter realised id', step=1, format='%d')
-if st.button('Save Integer', on_click=send_id_to_server(user_input)):
-    # This block is intentionally left empty
-    # The button click triggers the save_integer function
-    pass
+# to check if user_input is in nft_list['nft_id'], if not, show an error message
+if user_input not in nft_list['nft_id']:
+    st.error(f"ID {user_input} not found in the list.")
+else:
+    if st.button('Save Integer', on_click=send_id_to_server(user_input)):
+        # This block is intentionally left empty
+        # The button click triggers the save_integer function
+        pass
 
 # Conditional display of the success message based on session state
 # if st.session_state.show_success:
