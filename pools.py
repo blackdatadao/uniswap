@@ -314,8 +314,8 @@ def get_summary(df):
 def send_id_to_server(user_input,nft_list):
     url = 'http://42.192.17.155/realised_id'
     headers = {'Content-Type': 'application/json'}
-    if user_input not in nft_list['nft_id']:
-        st.error(f"ID {user_input} not found in the list.")
+    if user_input not in nft_list['nft_id'].values:
+        st.error(f"ID {user_input} not found.")
         return
     else:
         try:
@@ -388,9 +388,7 @@ for index,row in df4.iterrows():
 # Streamlit UI to input realised ID
 user_input = st.number_input('Enter realised id', step=1, format='%d')
 # to check if user_input is in nft_list['nft_id'], if not, show an error message
-id=1264785
-if id not in nft_list['nft_id']:
-    st.error(f"ID {id} not found in the list.")
+
 
 if st.button('Save Integer', on_click=send_id_to_server(user_input,nft_list)):
     # This block is intentionally left empty
