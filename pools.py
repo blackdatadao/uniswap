@@ -362,38 +362,34 @@ def show_realised_id():
 def delete_id_from_server(user_input):
     url = 'http://42.192.17.155/realised_id'
     headers = {'Content-Type': 'application/json'}
-    if user_input not in nft_list['nft_id'].values:
-        st.error(f"delete ID {user_input} not found.")
-        return
-    else:
-        try:
-            # GET request to fetch the current list
-            response = requests.get(url)
-            if response.status_code == 200:
-                    data = response.json()
-                    if user_input in data.values():
-                        data.remove(user_input)
-                        # POST request to send the updated list back to the server
-                        post_response = requests.post(url, json=data, headers=headers)
-                        post_response.raise_for_status()  # Check for HTTP errors
-                        success = st.success(f"{user_input} successfully sent to server.")
-                        time.sleep(3)
-                        success.empty() # Clear the alert
-                    else:
-                        st.error(f"delete ID {user_input} not found.")
-                        return
+    try:
+        # GET request to fetch the current list
+        response = requests.get(url)
+        if response.status_code == 200:
+                data = response.json()
+                if user_input in data:
+                    data.remove(user_input)
+                    # POST request to send the updated list back to the server
+                    post_response = requests.post(url, json=data, headers=headers)
+                    post_response.raise_for_status()  # Check for HTTP errors
+                    success = st.success(f"{user_input} successfully deleted.")
+                    time.sleep(3)
+                    success.empty() # Clear the alert
+                else:
+                    st.error(f"delete ID {user_input} not found.")
+                    return
 
-                    
-                    # st.session_state.show_success = True
+                
+                # st.session_state.show_success = True
 
-            else:
-                st.error('Error:', response.status_code)
-        except json.JSONDecodeError:
-            st.error('Error: Invalid JSON')
-        except requests.exceptions.HTTPError as e:
-            st.error('HTTP error occurred:', e)
-        except requests.exceptions.RequestException as e:
-            st.error('Request failed:', e)
+        else:
+            st.error('Error:', response.status_code)
+    except json.JSONDecodeError:
+        st.error('Error: Invalid JSON')
+    except requests.exceptions.HTTPError as e:
+        st.error('HTTP error occurred:', e)
+    except requests.exceptions.RequestException as e:
+        st.error('Request failed:', e)
     
 
 # summary tabel 
