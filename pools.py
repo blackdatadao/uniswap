@@ -341,6 +341,23 @@ def send_id_to_server(user_input,nft_list):
             st.error('HTTP error occurred:', e)
         except requests.exceptions.RequestException as e:
             st.error('Request failed:', e)
+def show_realised_id():
+    url = 'http://42.192.17.155/realised_id'
+    headers = {'Content-Type': 'application/json'}
+    try:
+        # GET request to fetch the current list
+        response = requests.get(url)
+        if response.status_code == 200:
+                data = response.json()
+                st.write(data)
+        else:
+            st.error('Error:', response.status_code)
+    except json.JSONDecodeError:
+        st.error('Error: Invalid JSON')
+    except requests.exceptions.HTTPError as e:
+        st.error('HTTP error occurred:', e)
+    except requests.exceptions.RequestException as e:
+        st.error('Request failed:', e)
 
 def delete_id_from_server(user_input):
     url = 'http://42.192.17.155/realised_id'
@@ -354,7 +371,7 @@ def delete_id_from_server(user_input):
             response = requests.get(url)
             if response.status_code == 200:
                     data = response.json()
-                    if user_input in data:
+                    if user_input in data.values():
                         data.remove(user_input)
                         # POST request to send the updated list back to the server
                         post_response = requests.post(url, json=data, headers=headers)
@@ -420,8 +437,7 @@ for index,row in df4.iterrows():
 
 
 
-# if 'show_success' not in st.session_state:
-#     st.session_state.show_success = False
+show_realised_id()
 # Streamlit UI to input realised ID
 user_input = st.number_input('Add Realised id', step=1, format='%d')
 # to check if user_input is in nft_list['nft_id'], if not, show an error message
