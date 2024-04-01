@@ -311,33 +311,36 @@ def get_summary(df):
     df_summary.columns=['w0','w1','c0','c1','fee','value','delta0','delta1','cost']
     return df_summary
 
-def send_id_to_server(user_input):
+def send_id_to_server(user_input,nft_list):
     url = 'http://42.192.17.155/realised_id'
     headers = {'Content-Type': 'application/json'}
+    if user_input not in nft_list['nft_id']:
+        st.error(f"ID {user_input} not found in the list.")
+        return
+    else:
+        try:
+            # GET request to fetch the current list
+            response = requests.get(url)
+            if response.status_code == 200:
+                    data = response.json()
+                    data.append(user_input)
+                    # POST request to send the updated list back to the server
+                    post_response = requests.post(url, json=data, headers=headers)
+                    post_response.raise_for_status()  # Check for HTTP errors
+                    
+                    # st.session_state.show_success = True
 
-    try:
-        # GET request to fetch the current list
-        response = requests.get(url)
-        if response.status_code == 200:
-                data = response.json()
-                data.append(user_input)
-                # POST request to send the updated list back to the server
-                post_response = requests.post(url, json=data, headers=headers)
-                post_response.raise_for_status()  # Check for HTTP errors
-                
-                # st.session_state.show_success = True
-
-                success = st.success(f"{user_input} successfully sent to server.")
-                time.sleep(3)
-                success.empty() # Clear the alert
-        else:
-            st.error('Error:', response.status_code)
-    except json.JSONDecodeError:
-        st.error('Error: Invalid JSON')
-    except requests.exceptions.HTTPError as e:
-        st.error('HTTP error occurred:', e)
-    except requests.exceptions.RequestException as e:
-        st.error('Request failed:', e)
+                    success = st.success(f"{user_input} successfully sent to server.")
+                    time.sleep(3)
+                    success.empty() # Clear the alert
+            else:
+                st.error('Error:', response.status_code)
+        except json.JSONDecodeError:
+            st.error('Error: Invalid JSON')
+        except requests.exceptions.HTTPError as e:
+            st.error('HTTP error occurred:', e)
+        except requests.exceptions.RequestException as e:
+            st.error('Request failed:', e)
 
 # summary tabel 
 nft_data = get_pools_details(df)
@@ -385,13 +388,12 @@ for index,row in df4.iterrows():
 # Streamlit UI to input realised ID
 user_input = st.number_input('Enter realised id', step=1, format='%d')
 # to check if user_input is in nft_list['nft_id'], if not, show an error message
-if user_input not in nft_list['nft_id']:
-    st.error(f"ID {user_input} not found in the list.")
-else:
-    if st.button('Save Integer', on_click=send_id_to_server(user_input)):
-        # This block is intentionally left empty
-        # The button click triggers the save_integer function
-        pass
+
+
+if st.button('Save Integer', on_click=send_id_to_server(user_input,nft_list)):
+    # This block is intentionally left empty
+    # The button click triggers the save_integer function
+    pass
 
 # Conditional display of the success message based on session state
 # if st.session_state.show_success:
