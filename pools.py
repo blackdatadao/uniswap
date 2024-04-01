@@ -342,6 +342,43 @@ def send_id_to_server(user_input,nft_list):
         except requests.exceptions.RequestException as e:
             st.error('Request failed:', e)
 
+def delete_id_from_server(user_input):
+    url = 'http://42.192.17.155/realised_id'
+    headers = {'Content-Type': 'application/json'}
+    if user_input not in nft_list['nft_id'].values:
+        st.error(f"delete ID {user_input} not found.")
+        return
+    else:
+        try:
+            # GET request to fetch the current list
+            response = requests.get(url)
+            if response.status_code == 200:
+                    data = response.json()
+                    if user_input in data:
+                        data.remove(user_input)
+                        # POST request to send the updated list back to the server
+                        post_response = requests.post(url, json=data, headers=headers)
+                        post_response.raise_for_status()  # Check for HTTP errors
+                        success = st.success(f"{user_input} successfully sent to server.")
+                        time.sleep(3)
+                        success.empty() # Clear the alert
+                    else:
+                        st.error(f"delete ID {user_input} not found.")
+                        return
+
+                    
+                    # st.session_state.show_success = True
+
+            else:
+                st.error('Error:', response.status_code)
+        except json.JSONDecodeError:
+            st.error('Error: Invalid JSON')
+        except requests.exceptions.HTTPError as e:
+            st.error('HTTP error occurred:', e)
+        except requests.exceptions.RequestException as e:
+            st.error('Request failed:', e)
+    
+
 # summary tabel 
 nft_data = get_pools_details(df)
 df3=pd.DataFrame(nft_data)
@@ -386,11 +423,17 @@ for index,row in df4.iterrows():
 # if 'show_success' not in st.session_state:
 #     st.session_state.show_success = False
 # Streamlit UI to input realised ID
-user_input = st.number_input('Enter realised id', step=1, format='%d')
+user_input = st.number_input('Add Realised id', step=1, format='%d')
 # to check if user_input is in nft_list['nft_id'], if not, show an error message
 
 
-if st.button('Save Integer', on_click=send_id_to_server(user_input,nft_list)):
+if st.button('Save ID', on_click=send_id_to_server(user_input,nft_list)):
+    # This block is intentionally left empty
+    # The button click triggers the save_integer function
+    pass
+
+user_delete = st.number_input('Delete realised id', step=1, format='%d')
+if st.button('delete ID', on_click=delete_id_from_server(user_delete)):
     # This block is intentionally left empty
     # The button click triggers the save_integer function
     pass
