@@ -378,8 +378,6 @@ for index,row in df4.iterrows():
 
 if 'show_success' not in st.session_state:
     st.session_state.show_success = False
-else:
-    st.session_state.show_success = False
 # Streamlit UI to input realised ID
 user_input = st.number_input('Enter realised id', step=1, format='%d')
 if st.button('Save Integer', on_click=send_id_to_server(user_input)):
@@ -392,6 +390,9 @@ if st.session_state.show_success:
     st.success("Data successfully sent to server2.")
     # Reset the flag so the message doesn't show again after a refresh or another action
     st.session_state.show_success = False
+       # Optional: Create a button to manually close the message
+    if st.button('Close Message'):
+        st.session_state.show_message = False
     
 
 
