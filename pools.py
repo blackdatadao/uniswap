@@ -73,6 +73,27 @@ nft_list=pd.DataFrame(nfts_list)
 #select the nfts which is open from the nft_list 
 df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
 
+def nft_infomration(nft_df):
+    df=nft_df
+    nft_data = get_pools_details(df)
+    df3=pd.DataFrame(nft_data)
+    #create a new column 'symbol1_price',if symbol1 is arb,then symbole1_price is the arbusdc_price,else is the 1
+    df3['symbol1_price']=df3['symbol1'].apply(lambda x: arbusdc_price if x=='ARB' else 1)
+    #create a new column 'symbol0_price',its value is ethusdc_price
+    df3['symbol0_price']=ethusdc_price
+    df3['fee_usdc']=df3['current_fee0']*df3['symbol0_price']+df3['current_fee1']*df3['symbol1_price']
+    df3['value']=df3['withdrawable_tokens0']*df3['symbol0_price']+df3['withdrawable_tokens1']*df3['symbol1_price']
+
+    df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration','current_price']]
+    #convert time object of df3['create_time'] to time object with format '%m-%d %H:%M'
+    df4['create_time']=df4['create_time'].map(lambda x:datetime.strptime(x,'%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M'))
+    df4['tick_avg']=(df4['tick_lower']+df4['tick_upper'])/2
+    #create new colomn which is fee_usdc/value/duration*24
+    df4['apr']=df4['fee_usdc']/df4['value']/df4['duration']*24*100
+    df4['return']=df4['fee_usdc']/df4['value']*100
+    df4=df4.round(1)
+    df4=df4.sort_values(by='nft_id',ascending=True)
+    return df4
 
 def get_nft_data(nft_id, w3, factory_contract, nft_position_manager):
     d = my.get_output_by_nft_id(nft_id, w3, factory_contract, nft_position_manager)
@@ -440,14 +461,10 @@ user_input = st.number_input('Add Realised id', step=1, format='%d')
 
 
 if st.button('Save ID', on_click=send_id_to_server(user_input,nft_list)):
-    # This block is intentionally left empty
-    # The button click triggers the save_integer function
     pass
 
 user_delete = st.number_input('Delete realised id', step=1, format='%d')
 if st.button('delete ID', on_click=delete_id_from_server(user_delete)):
-    # This block is intentionally left empty
-    # The button click triggers the save_integer function
     pass
 
 # Conditional display of the success message based on session state
@@ -553,12 +570,12 @@ st.plotly_chart(fig, use_container_width=True)
 fig=get_volume_chart()
 st.plotly_chart(fig, use_container_width=True)
 
-# total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
-# st.markdown(f'**total amount0** {total_amount0_}')
-# st.markdown(f'**total amount1** {total_amount1_}')
-# st.markdown(f'**current price** {current_price}')
-# st.plotly_chart(fig_left, use_container_width=True)
-# st.plotly_chart(fig_right, use_container_width=True)
+total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
+st.markdown(f'**total amount0** {total_amount0_}')
+st.markdown(f'**total amount1** {total_amount1_}')
+st.markdown(f'**current price** {current_price}')
+st.plotly_chart(fig_left, use_container_width=True)
+st.plotly_chart(fig_right, use_container_width=True)
 
 iframe_url='https://dune.com/embeds/2272843/3725900'
 i_width=600
