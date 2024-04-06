@@ -405,8 +405,8 @@ arbeth_price=my.get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5
 arbusdc_price=1/arbeth_price*ethusdc_price
 
 
-# st.markdown(f'**ETH/usdc** {round(ethusdc_price,2)}')
-# st.markdown(f'**ETH/arb** {round(arbeth_price,2)}')
+st.markdown(f'**ETH/usdc** {round(ethusdc_price,2)}')
+st.markdown(f'**ETH/arb** {round(arbeth_price,2)}')
 
 try:
     my.update_nft_list(wallet_address,w3,nft_position_manager)
@@ -424,7 +424,7 @@ nft_list=pd.DataFrame(nfts_list)
 df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
 
 # summary tabel 
-nft_data = get_pools_details(df['nft_id'])
+nft_data = get_pools_details(df)
 df3=pd.DataFrame(nft_data)
 #create a new column 'symbol1_price',if symbol1 is arb,then symbole1_price is the arbusdc_price,else is the 1
 df3['symbol1_price']=df3['symbol1'].apply(lambda x: arbusdc_price if x=='ARB' else 1)
