@@ -7,7 +7,7 @@ assert response.status_code==200
 nfts_list=response.json()
 id=50689
 
-if id not in nfts_list.values:
+if id not in nfts_list:
     print('id not in nft_list')
     exit()
 else:
