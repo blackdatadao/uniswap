@@ -423,7 +423,7 @@ nft_list=pd.DataFrame(nfts_list)
 #select the nfts which is open from the nft_list 
 df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
 
-# summary tabel 
+summary tabel 
 nft_data = get_pools_details(df)
 df3=pd.DataFrame(nft_data)
 #create a new column 'symbol1_price',if symbol1 is arb,then symbole1_price is the arbusdc_price,else is the 1
