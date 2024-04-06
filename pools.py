@@ -404,6 +404,15 @@ ethusdc_price=my.get_current_price_by_pool_address(w3,'0xC31E54c7a869B9FcBEcc143
 arbeth_price=my.get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
 arbusdc_price=1/arbeth_price*ethusdc_price
 
+url='http://42.192.17.155/nft_list'
+response = requests.get(url)
+assert response.status_code==200
+nfts_list=response.json()
+nft_list=pd.DataFrame(nfts_list)
+#select the nfts which is open from the nft_list 
+df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
+df_open_nft=nft_infomration_to_show(df['nft_id'])
+
 st.markdown(f'**ETH/usdc** {round(ethusdc_price,2)}')
 st.markdown(f'**ETH/arb** {round(arbeth_price,2)}')
 
