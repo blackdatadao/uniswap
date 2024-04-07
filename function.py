@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#streamlit run pools.py --server.address=0.0.0.0
-
+#
 
 from math import log
 from web3 import Web3,HTTPProvider
@@ -160,14 +159,8 @@ def get_increase_liquidity_by_nft_id(
         #calculate time stamp to datetime
         df['create_time']=df['timeStamp'].map(lambda x:time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(x)))
         #decode the data
-        df['data_decoded'] = df['data'].map(
-            lambda x: decode(
-                ['uint256', 'uint256', 'uint256'],
-                bytes.fromhex(x[2:] if x.startswith('0x') else x)
-            )
-        )
         #{"indexed":false,"internalType":"uint128","name":"liquidity","type":"uint128"},{"indexed":false,"internalType":"uint256","name":"amount0","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1","type":"uint256"}],"name":"IncreaseLiquidity","type":"event"}
-        # df['data_decoded']=df['data'].map(lambda x:decode(['uint256','uint256','uint256'],bytes.fromhex(x[2:])))
+        df['data_decoded']=df['data'].map(lambda x:decode(['uint256','uint256','uint256'],bytes.fromhex(x[2:])))
         # df['data_decoded']=df['data_decoded'].map(lambda x:eval(x))
         #split data_decoded to 3 columns
         df['token0']=df['data_decoded'].map(lambda x:x[1])
@@ -201,12 +194,7 @@ def get_decrease_liquidity_by_nft_id(
         df['create_time']=df['timeStamp'].map(lambda x:time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(x)))
         #decode the data
         #{"indexed":false,"internalType":"uint128","name":"liquidity","type":"uint128"},{"indexed":false,"internalType":"uint256","name":"amount0","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1","type":"uint256"}],"name":"IncreaseLiquidity","type":"event"}
-        df['data_decoded'] = df['data'].map(
-            lambda x: decode(
-                ['uint256', 'uint256', 'uint256'],
-                bytes.fromhex(x[2:] if x.startswith('0x') else x)
-            )
-        )
+        df['data_decoded']=df['data'].map(lambda x:decode(['uint256','uint256','uint256'],bytes.fromhex(x[2:])))
         # df['data_decoded']=df['data_decoded'].map(lambda x:eval(x))
         #split data_decoded to 3 columns
         df['token0']=df['data_decoded'].map(lambda x:x[1])
@@ -555,7 +543,7 @@ def get_output_by_nft_id(nft_id,w3,factory_contract,nft_position_manager):
         collect_timestamp=time.mktime(datetime.strptime(collected['time'],'%Y-%m-%d %H:%M:%S').timetuple())
         duration=(collect_timestamp-initial_timestamp)/(60*60)
         collected_time=collected['time']
-    
+
     return dict(
         nft_id=nft_id,
         symbol0=fees_params['symbol0'],symbol1=fees_params['symbol1'],
