@@ -1,8 +1,5 @@
 import time,requests,json
 import pandas as pd
-import streamlit as st
-
-st.title('Hello, Streamlit!')
 
 url='http://42.192.17.155/realised_id'
 response = requests.get(url)

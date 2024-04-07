@@ -355,5 +355,5 @@ def get_pool_distribution():
 
 # total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
 # fig_left.show()
-# fig=get_volume_chart()
-# fig.show()
+fig=get_volume_chart()
+fig.show()
