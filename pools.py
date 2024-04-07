@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 #
 
+import asyncio
+
+# Create a new event loop and set it as the current event loop
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+
 import pandas as pd
 import json,time
 from web3 import Web3,HTTPProvider
@@ -33,6 +39,7 @@ from binance.lib.utils import config_logging
 import pandas as pd
 from datetime import datetime
 import plotly.graph_objects as go
+
 
 factory_address='0x1F98431c8aD98523631AE4a59f267346ea31F984'
 contract_address='0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
@@ -75,6 +82,7 @@ df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
 
 
 def get_nft_data(nft_id, w3, factory_contract, nft_position_manager):
+    print(f"Getting data for NFT ID {nft_id}")
     d = my.get_output_by_nft_id(nft_id, w3, factory_contract, nft_position_manager)
     return d
 
