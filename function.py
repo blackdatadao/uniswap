@@ -234,7 +234,9 @@ def get_collected_by_nft_id(
         df['create_time']=df['timeStamp'].map(lambda x:time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(x)))
         #decode the data
         #{"indexed":false,"internalType":"uint128","name":"liquidity","type":"uint128"},{"indexed":false,"internalType":"uint256","name":"amount0","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1","type":"uint256"}],"name":"IncreaseLiquidity","type":"event"}
-        df['data_decoded']=df['data'].map(lambda x:decode(['uint256','uint256','uint256'],bytes.fromhex(x[2:])))
+        # df['data_decoded']=df['data'].map(lambda x:decode(['uint256','uint256','uint256'],bytes.fromhex(x[2:])))
+        df['data_decoded']=df['data'].map(lambda x:decode(['uint256','uint256','uint256'],bytes.fromhex(x[2:]) if x.startswith('0x') else bytes.fromhex(x)))
+
         # df['data_decoded']=df['data_decoded'].map(lambda x:eval(x))
         #split data_decoded to 3 columns
         
@@ -598,7 +600,8 @@ def get_current_price_by_pool_address(
             timestamp_end=connection.eth.get_block(int(df['blockNumber'].tail(1)))['timestamp']
             date=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_end))
 
-            df['data_decoded']=df['data'].map(lambda x:decode(['int256','int256','int256'],bytes.fromhex(x[2:])))
+            # df['data_decoded']=df['data'].map(lambda x:decode(['int256','int256','int256'],bytes.fromhex(x[2:])))
+            df['data_decoded']=df['data'].map(lambda x:decode(['int256','int256','int256'],bytes.fromhex(x[2:]) if x.startswith('0x') else bytes.fromhex(x)))
             df['amount0']=abs(df['data_decoded'].map(lambda x:x[0]))
             df['amount1']=abs(df['data_decoded'].map(lambda x:x[1]))
             if pool_address.lower()=='0xc6f780497a95e246eb9449f5e4770916dcd6396a':
