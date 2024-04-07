@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+import asyncio
+
+# Create a new event loop and set it as the current event loop
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 
 import pandas as pd
 import json,time
@@ -17,7 +22,7 @@ import requests,os
 
 from streamlit.components.v1 import iframe
 from binance_kline import get_kline_data_from_binance,reverse_price,plot_price_comparison,plot_kline_data,calculate_rolling_beta,plot_dual_axis_time_series_plotly,calculate_rolling_beta_and_correlation,plot_dual_axis_time_series_plotly_three,calculate_rolling_volatility
-from subgraph_liquidity_distribution_arb import get_volume_chart,get_pool_distribution
+from subgraph_liquidity_distribution_arb import get_volume_chart,get_pool_distribution,get_hourly_locked_token_chart
 
 
 import logging
@@ -34,7 +39,10 @@ import pandas as pd
 from datetime import datetime
 import plotly.graph_objects as go
 
-
+def dune_embed_url(iframe_url):
+    i_width=600
+    i_height=400
+    iframe(iframe_url, width=i_width, height=i_height, scrolling=True)
 
 def nft_infomration_to_show(nft_list):
     # df=nft_df
@@ -84,14 +92,14 @@ def get_current_price_etharb(
     tb=connection.eth.block_number
     cAddress="0xc6f780497a95e246eb9449f5e4770916dcd6396a"
     tp=["0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"]
-    start_time=time.time()
+    # start_time=time.time()
     result=connection.eth.get_logs(
         {"address": Web3.to_checksum_address(cAddress), 
     "topics":tp,
     "fromBlock":Web3.to_hex(fb),
     "toBlock":Web3.to_hex(tb)
     })
-    print('time cost:',time.time()-start_time)
+    # print('time cost:',time.time()-start_time)
 
     if result!=[]:
         temp=Web3.to_json(result)#result is a list of attributeDict type,convert attributeDict to json
@@ -100,8 +108,8 @@ def get_current_price_etharb(
         df=pd.read_json(temp)
         timestamp_start=connection.eth.get_block(int(df['blockNumber'][0]))['timestamp']
         timestamp_end=connection.eth.get_block(int(df['blockNumber'].tail(1)))['timestamp']
-        print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_start)))
-        print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_end)))
+        # print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_start)))
+        # print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_end)))
         
         
         #get the timestamp of each transaction
@@ -138,14 +146,14 @@ def get_history_price_etharb(
     tb=connection.eth.block_number
     cAddress="0xc6f780497a95e246eb9449f5e4770916dcd6396a"
     tp=["0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"]
-    start_time=time.time()
+    # start_time=time.time()
     result=connection.eth.get_logs(
         {"address": Web3.to_checksum_address(cAddress), 
     "topics":tp,
     "fromBlock":Web3.to_hex(fb),
     "toBlock":Web3.to_hex(tb)
     })
-    print('time cost:',time.time()-start_time)
+    # print('time cost:',time.time()-start_time)
 
     if result!=[]:
         temp=Web3.to_json(result)#result is a list of attributeDict type,convert attributeDict to json
@@ -153,8 +161,8 @@ def get_history_price_etharb(
         df=pd.read_json(temp)
         timestamp_start=connection.eth.get_block(int(df['blockNumber'][0]))['timestamp']
         timestamp_end=connection.eth.get_block(int(df['blockNumber'].tail(1)))['timestamp']
-        print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_start)))
-        print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_end)))
+        # print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_start)))
+        # print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_end)))
         
         
         #get the timestamp of each transaction
@@ -192,14 +200,14 @@ def get_history_price_ethusdc(
     tb=connection.eth.block_number
     cAddress="0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443"
     tp=["0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"]
-    start_time=time.time()
+    # start_time=time.time()
     result=connection.eth.get_logs(
         {"address": Web3.to_checksum_address(cAddress), 
     "topics":tp,
     "fromBlock":Web3.to_hex(fb),
     "toBlock":Web3.to_hex(tb)
     })
-    print('time cost:',time.time()-start_time)
+    # print('time cost:',time.time()-start_time)
 
     if result!=[]:
         temp=Web3.to_json(result)#result is a list of attributeDict type,convert attributeDict to json
@@ -207,8 +215,8 @@ def get_history_price_ethusdc(
         df=pd.read_json(temp)
         timestamp_start=connection.eth.get_block(int(df['blockNumber'][0]))['timestamp']
         timestamp_end=connection.eth.get_block(int(df['blockNumber'].tail(1)))['timestamp']
-        print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_start)))
-        print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_end)))
+        # print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_start)))
+        # print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_end)))
         
         
         #get the timestamp of each transaction
@@ -246,14 +254,14 @@ def get_swap_price_ethusdc(
     tb=connection.eth.block_number
     cAddress="0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443"
     tp=["0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"]
-    start_time=time.time()
+    # start_time=time.time()
     result=connection.eth.get_logs(
         {"address": Web3.to_checksum_address(cAddress), 
     "topics":tp,
     "fromBlock":Web3.to_hex(fb),
     "toBlock":Web3.to_hex(tb)
     })
-    print('time cost:',time.time()-start_time)
+    # print('time cost:',time.time()-start_time)
     if result!=[]:
         temp=Web3.to_json(result)#result is a list of attributeDict type,convert attributeDict to json
         df=pd.read_json(temp).iloc[-1,0]
@@ -335,7 +343,7 @@ def show_realised_id():
         if response.status_code == 200:
                 data = response.json()
                 df_realised=nft_infomration_to_show(data)
-                for index,row in df_open_nft.iterrows():
+                for index,row in df_realised.iterrows():
                     with st.container():
                         color = "green" if row['tick_lower'] < row['current_price'] and row['tick_upper'] > row['current_price'] else "black"
                         st.markdown(f'<span style="color: {color};"><strong>{row["symbol0"]}/{row["symbol1"]} < {row["tick_lower"]}-{row["tick_upper"]}></strong>@{row["tick_avg"]}  |  **Create:** {row["create_token0"]}/{row["create_token1"]} @{row["create_time"]}|{row["duration"]}H **#** {row["nft_id"]}</span>', unsafe_allow_html=True)
@@ -400,13 +408,28 @@ with open(r"factory abi.json") as json_file:
 factory_contract=w3.eth.contract(address=Web3.to_checksum_address(factory_address.lower()),abi=factory_abi)
 wallet_address='0x9742499f4f1464c5b3dbf4d04adcbc977fbf7baa'
 
+st.markdown("""
+<div style="background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
+    <h2 style="color: #333; font-size: 24px;">Making Huge Money</h2>
+</div>
+""",unsafe_allow_html=True)
+
 ethusdc_price=my.get_current_price_by_pool_address(w3,'0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443',1)['price0']
 arbeth_price=my.get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
 arbusdc_price=1/arbeth_price*ethusdc_price
 
+html_content = f"""
+<div style="display: flex; justify-content: space-between;background-color: #f0f2f6; padding: 10px; border-radius: 5px;font-size: 18px;">
+    <div style="margin-right: 10px;"><strong>ETH/usdc:</strong> {round(ethusdc_price,2)}</div>
+    <div style="margin-right: 10px;"><strong>ETH/arb:</strong> {round(arbeth_price,2)}</div>
+    <div><strong>ARB/usdc:</strong> {round(arbusdc_price,3)}</div>
+</div>
+"""
+st.markdown(html_content, unsafe_allow_html=True)
 
 # st.markdown(f'**ETH/usdc** {round(ethusdc_price,2)}')
 # st.markdown(f'**ETH/arb** {round(arbeth_price,2)}')
+# st.markdown(f'**ARB/usdc** {round(arbusdc_price,2)}')
 
 try:
     my.update_nft_list(wallet_address,w3,nft_position_manager)
@@ -422,29 +445,7 @@ nfts_list=response.json()
 nft_list=pd.DataFrame(nfts_list)
 #select the nfts which is open from the nft_list 
 df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
-
-# summary tabel 
-nft_data = get_pools_details(df['nft_id'])
-df3=pd.DataFrame(nft_data)
-#create a new column 'symbol1_price',if symbol1 is arb,then symbole1_price is the arbusdc_price,else is the 1
-df3['symbol1_price']=df3['symbol1'].apply(lambda x: arbusdc_price if x=='ARB' else 1)
-#create a new column 'symbol0_price',its value is ethusdc_price
-df3['symbol0_price']=ethusdc_price
-df3['fee_usdc']=df3['current_fee0']*df3['symbol0_price']+df3['current_fee1']*df3['symbol1_price']
-df3['value']=df3['withdrawable_tokens0']*df3['symbol0_price']+df3['withdrawable_tokens1']*df3['symbol1_price']
-
-df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration','current_price']]
-#convert time object of df3['create_time'] to time object with format '%m-%d %H:%M'
-df4['create_time']=df4['create_time'].map(lambda x:datetime.strptime(x,'%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M'))
-df4['tick_avg']=(df4['tick_lower']+df4['tick_upper'])/2
-#create new colomn which is fee_usdc/value/duration*24
-df4['apr']=df4['fee_usdc']/df4['value']/df4['duration']*24*100
-df4['return']=df4['fee_usdc']/df4['value']*100
-df4=df4.round(1)
-df4=df4.sort_values(by='nft_id',ascending=True)
-
-df_open_nft=df4
-# df_open_nft=nft_infomration_to_show(df['nft_id'])
+df_open_nft=nft_infomration_to_show(df['nft_id'])
 
 #select the data from df4 where current price in range of tick_lower and tick_upper
 df_inrange=df_open_nft[(df_open_nft['current_price']>=df_open_nft['tick_lower'])&(df_open_nft['current_price']<=df_open_nft['tick_upper'])]
@@ -460,14 +461,25 @@ st.markdown('total summary inrange')
 st.dataframe(summary_inrange)
 st.markdown('total summary outrange')
 st.dataframe(summary_outrange)
+
+st.markdown("""
+<div style="background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
+    <h2 style="color: #333; font-size: 24px;">Open Position</h2>
+</div>
+""",unsafe_allow_html=True)
+
 for index,row in df_open_nft.iterrows():
     with st.container():
         color = "green" if row['tick_lower'] < row['current_price'] and row['tick_upper'] > row['current_price'] else "black"
         st.markdown(f'<span style="color: {color};"><strong>{row["symbol0"]}/{row["symbol1"]} < {row["tick_lower"]}-{row["tick_upper"]}></strong>@{row["tick_avg"]}  |  **Create:** {row["create_token0"]}/{row["create_token1"]} @{row["create_time"]}|{row["duration"]}H **#** {row["nft_id"]}</span>', unsafe_allow_html=True)
         st.markdown(f'<span style="color: {color};"><strong>**Fee** {row["fee_usdc"]}</strong> < {row["withdrawable_tokens0"]}|{row["withdrawable_tokens1"]}> **value** {row["value"]} | {row["return"]} % **day** {row["apr"]} %</span>', unsafe_allow_html=True)
 
-
-st.markdown('**Realised information**')
+# show the realised id which is removed nft with diffrent principal and not trade back in the following
+st.markdown("""
+<div style="background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
+    <h2 style="color: #333; font-size: 24px;">Realised Information</h2>
+</div>
+""",unsafe_allow_html=True)
 show_realised_id()
 # Streamlit UI to input realised ID
 user_input = st.number_input('Add Realised id', step=1, format='%d')
@@ -480,18 +492,6 @@ if st.button('Save ID', on_click=send_id_to_server(user_input,nft_list)):
 user_delete = st.number_input('Delete realised id', step=1, format='%d')
 if st.button('delete ID', on_click=delete_id_from_server(user_delete)):
     pass
-
-# Conditional display of the success message based on session state
-# if st.session_state.show_success:
-#     st.success("Data successfully sent to server2.")
-#     # Reset the flag so the message doesn't show again after a refresh or another action
-#     st.session_state.show_success = False
-#        # Optional: Create a button to manually close the message
-#     if st.button('Close Message'):
-#         st.session_state.show_message = False
-    
-
-
 
 #plot the history price of etharb and ethusdc
 df=get_history_price_etharb(w3)
@@ -584,12 +584,23 @@ st.plotly_chart(fig, use_container_width=True)
 fig=get_volume_chart()
 st.plotly_chart(fig, use_container_width=True)
 
-total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
-st.markdown(f'**total amount0** {total_amount0_}')
-st.markdown(f'**total amount1** {total_amount1_}')
-st.markdown(f'**current price** {current_price}')
-st.plotly_chart(fig_left, use_container_width=True)
-st.plotly_chart(fig_right, use_container_width=True)
+fig=get_hourly_locked_token_chart()
+st.plotly_chart(fig, use_container_width=True)
+
+# total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
+# st.markdown(f'**total amount0** {total_amount0_}')
+# st.markdown(f'**total amount1** {total_amount1_}')_
+# st.markdown(f'**current price** {current_price}')
+# st.plotly_chart(fig_left, use_container_width=True)
+# st.plotly_chart(fig_right, use_container_width=True)
+
+#eth/usdc 0.05
+dune_embed_url("https://dune.com/embeds/3598735/6063295/")
+#eth/arb 0.05
+dune_embed_url("https://dune.com/embeds/3598737/6063299")
+
+url="https://dune.com/kyoronut/arbitrum-uniswap-v3-major-pools-liquidity-distributions"
+st.markdown(f"[other distribution map]({url})")
 
 iframe_url='https://dune.com/embeds/2272843/3725900'
 i_width=600
@@ -602,9 +613,12 @@ url_op_price_vol='https://dune.com/embeds/2331467/3816872'
 
 iframe(url_usd_vol, width=i_width, height=i_height, scrolling=True)
 iframe(url_op_price_vol, width=i_width, height=i_height, scrolling=True)
-iframe(url_table_arb_price_vol, width=i_width, height=i_height, scrolling=True)
+# iframe(url_table_arb_price_vol, width=i_width, height=i_height, scrolling=True)
 
 
 url="https://info.uniswap.org/#/arbitrum/"
 st.markdown(f"[official data]({url})")
+
+
+
 

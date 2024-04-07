@@ -122,6 +122,77 @@ def get_volume_chart():
     )   
     return fig
 
+def get_hourly_locked_token_chart():
+    POOL_ID = "0xc6f780497a95e246eb9449f5e4770916dcd6396a" #arb mainnet 0.05% ARB/ETH pool
+    # POOL_ID="0xC6962004f452bE9203591991D15f6b388e09E8D0" #arb mainnet 0.05% eth/usdc pool
+    hourly_query = """query get_hours($first: Int, $pool_id: ID!) {
+    liquidityPools(where: {id: $pool_id}) {
+        hourlySnapshots(orderBy: hour, orderDirection: desc, first: $first) {
+        inputTokenBalances
+        hour
+        }
+    }
+    }"""
+    hour_data={}
+    try:
+        variables = {"first": 168, "pool_id": POOL_ID}
+        response = client.execute(gql(hourly_query), variable_values=variables)
+
+        if len(response['liquidityPools']) == 0:
+            print("pool not found")
+            exit(-1)
+        hourly=response['liquidityPools'][0]['hourlySnapshots']
+        # get hour, totalValueLockedUSD, hourlyVolumeUSD
+        for item in hourly:
+            hour_data[item['hour']]=item['inputTokenBalances']
+
+        # print(hour_data)
+    except Exception as ex:
+        print("got exception while querying hourly data:", ex)
+        exit(-1)
+
+    # convert the hour_data to dataframe with columns hour,TVL,Volume
+    df = pd.DataFrame(list(hour_data.items()),columns = ['hour','data'])
+    df['ETH'] = df['hour'].map(lambda x: float(hour_data[x][0])/10**18)
+    df['ARB'] = df['hour'].map(lambda x: float(hour_data[x][1])/10**18)
+    #drop the data column
+    df = df.drop(columns=['data'])
+    #convert hour to readable time
+    epoch_start = datetime(1970, 1, 1)
+    df['hour'] = df['hour'].map(lambda x: epoch_start + timedelta(hours=x+8))
+    hour_data=df
+    #plot the TVL and Volume on two left and right y axis
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=hour_data['hour'], y=hour_data['ETH'], name="ETH",line=dict(color='royalblue')))
+    fig.add_trace(go.Scatter(x=hour_data['hour'], y=hour_data['ARB'], name="ARB",line=dict(color='firebrick'),yaxis="y2"))
+    fig.update_layout(title_text='POOL ETH and ARB locked')
+    fig.update_layout(
+        yaxis=dict(
+            title="ETH",
+            titlefont=dict(
+                color="royalblue"
+            ),
+            tickfont=dict(
+                color="royalblue"
+            )
+        ),
+        yaxis2=dict(
+            title="ARB",
+            titlefont=dict(
+                color="firebrick"
+            ),
+            tickfont=dict(
+                color="firebrick"
+            ),
+            overlaying="y",
+            side="right"
+        )
+    )   
+    return fig
+
+
+
+
 # get pool info
 def get_pool_distribution():
     POOL_ID = "0xc6f780497a95e246eb9449f5e4770916dcd6396a" #arb mainnet 0.05% ARB/ETH pool
@@ -350,6 +421,10 @@ def get_pool_distribution():
     #     total_amount0 / 10 ** decimals0, token0, total_amount1 / 10 ** decimals1, token1))
 
     return total_amount0_,total_amount1_,current_price,fig_left,fig_right
+
+
+
+
 
 # total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
 # fig_left.show()

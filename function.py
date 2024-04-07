@@ -129,8 +129,8 @@ def get_new_NFTS_by_address(address,w3,nft_position_manager,last_index):
         print(index,'...finished')
         index+=1
         #save NFTS to a json file
-        with open (r'D:\app\uniswap_bot\new_NFTS.json','w') as f:
-            json.dump(NFTS,f)
+        # with open (r'D:\app\uniswap_bot\new_NFTS.json','w') as f:
+        #     json.dump(NFTS,f)
     return NFTS
 
 
@@ -475,7 +475,7 @@ def calc_fees_and_withdrawable(calc_fees_params,w3,pool_address):
             adj_fees1=0
             adj_amt0=0
             adj_amt1=0
-            current_price=None
+            current_price=0
         return dict(
             fee0=adj_fees0, fee1=adj_fees1,amt0=adj_amt0,amt1=adj_amt1,
             current_price=current_price
