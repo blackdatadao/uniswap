@@ -161,7 +161,7 @@ def get_increase_liquidity_by_nft_id(
         #decode the data
         #{"indexed":false,"internalType":"uint128","name":"liquidity","type":"uint128"},{"indexed":false,"internalType":"uint256","name":"amount0","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1","type":"uint256"}],"name":"IncreaseLiquidity","type":"event"}
         # df['data_decoded']=df['data'].map(lambda x:decode(['uint256','uint256','uint256'],bytes.fromhex(x[2:])))
-        df['data_decoded']=df['data'].map(lambda x:decode(['uint256','uint256','uint256'],bytes.fromhex(x[2:]) if x.startswith('0x') else x))
+        df['data_decoded']=df['data'].map(lambda x:decode(['uint256','uint256','uint256'],bytes.fromhex(x[2:]) if x.startswith('0x') else bytes.fromhex(x)))
 
         # df['data_decoded']=df['data_decoded'].map(lambda x:eval(x))
         #split data_decoded to 3 columns
