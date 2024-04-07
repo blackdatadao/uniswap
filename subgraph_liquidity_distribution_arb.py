@@ -54,6 +54,7 @@ client = Client(
 
 def get_volume_chart():
     POOL_ID = "0xc6f780497a95e246eb9449f5e4770916dcd6396a" #arb mainnet 0.05% ARB/ETH pool
+    # POOL_ID="0xC6962004f452bE9203591991D15f6b388e09E8D0" #arb mainnet 0.05% eth/usdc pool
     hourly_query = """query get_hours($first: Int, $pool_id: ID!) {
     liquidityPools(where: {id: $pool_id}) {
         hourlySnapshots(orderBy: hour, orderDirection: desc, first: $first) {
@@ -76,7 +77,7 @@ def get_volume_chart():
         for item in hourly:
             hour_data[item['hour']]=[item['totalValueLockedUSD'],item['hourlyVolumeUSD']]
 
-        print(hour_data)
+        # print(hour_data)
     except Exception as ex:
         print("got exception while querying hourly data:", ex)
         exit(-1)
@@ -174,7 +175,7 @@ def get_pool_distribution():
     num_skip = 0
     try:
         while True:
-            # print("Querying ticks, num_skip={}".format(num_skip))
+            print("Querying ticks, num_skip={}".format(num_skip))
             variables = {"num_skip": num_skip, "pool_id": POOL_ID}
             response = client.execute(gql(tick_query), variable_values=variables)
 
@@ -352,8 +353,5 @@ def get_pool_distribution():
 
 # total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
 # fig_left.show()
-
-# total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
-# fig_left.show()
-fig=get_volume_chart()
-fig.show()
+# fig=get_volume_chart()
+# fig.show()
