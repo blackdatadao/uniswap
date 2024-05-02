@@ -6,7 +6,7 @@ eth_abi
 numpy
 plotly
 requests
-binance-connector-python
+binance-connector
 gql
 datetime
 requests_toolbelt

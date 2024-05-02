@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
+#streamlit run pools.py
 import asyncio
 
 # Create a new event loop and set it as the current event loop
@@ -532,6 +532,44 @@ fig.update_xaxes(tickmode='array',tickvals=tick_values, ticktext=tick_labels)
 fig.update_layout(title='ETH/usdc price')
 st.plotly_chart(fig, use_container_width=True)
 
+fig=get_volume_chart()
+st.plotly_chart(fig, use_container_width=True)
+
+fig=get_hourly_locked_token_chart()
+st.plotly_chart(fig, use_container_width=True)
+
+# total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
+# st.markdown(f'**total amount0** {total_amount0_}')
+# st.markdown(f'**total amount1** {total_amount1_}')_
+# st.markdown(f'**current price** {current_price}')
+# st.plotly_chart(fig_left, use_container_width=True)
+# st.plotly_chart(fig_right, use_container_width=True)
+
+#eth/usdc 0.05
+dune_embed_url("https://dune.com/embeds/3598735/6063295/")
+#eth/arb 0.05
+dune_embed_url("https://dune.com/embeds/3598737/6063299")
+
+url="https://dune.com/kyoronut/arbitrum-uniswap-v3-major-pools-liquidity-distributions"
+st.markdown(f"[other distribution map]({url})")
+
+iframe_url='https://dune.com/embeds/2272843/3725900'
+i_width=600
+i_height=400
+iframe(iframe_url, width=i_width, height=i_height, scrolling=True)
+
+url_table_arb_price_vol='https://dune.com/embeds/2272843/3725430'
+url_usd_vol='https://dune.com/embeds/2349162/3846118'
+url_op_price_vol='https://dune.com/embeds/2331467/3816872'
+
+iframe(url_usd_vol, width=i_width, height=i_height, scrolling=True)
+iframe(url_op_price_vol, width=i_width, height=i_height, scrolling=True)
+# iframe(url_table_arb_price_vol, width=i_width, height=i_height, scrolling=True)
+
+
+url="https://info.uniswap.org/#/arbitrum/"
+st.markdown(f"[official data]({url})")
+
 #plot 1 hours klines of arbeth
 ARBETH=get_kline_data_from_binance('ARBETH','1h',24)
 ETHARB=reverse_price(ARBETH)
@@ -588,43 +626,7 @@ st.plotly_chart(fig, use_container_width=True)
 fig=plot_dual_axis_time_series_plotly_three(ARBUSD['Open Time'],ETHUSD['normalized_average'],volatility_series_ETH,volatility_series_ARB,label1='ETH/USD',label2='ETH vol',label3='ARB vol',axis1_name='ETH/USD',axis2_name='ETH vol',axis3_name='ARB vol',title='volatility vs ARB/USD vs ETH/USD')
 st.plotly_chart(fig, use_container_width=True)
 
-fig=get_volume_chart()
-st.plotly_chart(fig, use_container_width=True)
 
-fig=get_hourly_locked_token_chart()
-st.plotly_chart(fig, use_container_width=True)
-
-# total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
-# st.markdown(f'**total amount0** {total_amount0_}')
-# st.markdown(f'**total amount1** {total_amount1_}')_
-# st.markdown(f'**current price** {current_price}')
-# st.plotly_chart(fig_left, use_container_width=True)
-# st.plotly_chart(fig_right, use_container_width=True)
-
-#eth/usdc 0.05
-dune_embed_url("https://dune.com/embeds/3598735/6063295/")
-#eth/arb 0.05
-dune_embed_url("https://dune.com/embeds/3598737/6063299")
-
-url="https://dune.com/kyoronut/arbitrum-uniswap-v3-major-pools-liquidity-distributions"
-st.markdown(f"[other distribution map]({url})")
-
-iframe_url='https://dune.com/embeds/2272843/3725900'
-i_width=600
-i_height=400
-iframe(iframe_url, width=i_width, height=i_height, scrolling=True)
-
-url_table_arb_price_vol='https://dune.com/embeds/2272843/3725430'
-url_usd_vol='https://dune.com/embeds/2349162/3846118'
-url_op_price_vol='https://dune.com/embeds/2331467/3816872'
-
-iframe(url_usd_vol, width=i_width, height=i_height, scrolling=True)
-iframe(url_op_price_vol, width=i_width, height=i_height, scrolling=True)
-# iframe(url_table_arb_price_vol, width=i_width, height=i_height, scrolling=True)
-
-
-url="https://info.uniswap.org/#/arbitrum/"
-st.markdown(f"[official data]({url})")
 
 
 

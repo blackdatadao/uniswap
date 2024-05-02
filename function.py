@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+# use package in other directory
+# path='D:/uniswaptrade/env/Lib/site-packages'
+# import sys
+# if path not in sys.path:
+#     sys.path.append(path)
+
 
 from math import log
 from web3 import Web3,HTTPProvider
@@ -77,6 +83,7 @@ def get_pool_infor_by_nft_id(nft_id,nft_position_manager):
     #     contract_abi = json.load(json_file)
     # contract_address='0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
     # nft_position_manager=w3.eth.contract(address=contract_address,abi=contract_abi)
+    print(nft_id)
     position_data=nft_position_manager.functions.positions(nft_id).call()
     pool_address=position_data[1]
     fee=position_data[4]

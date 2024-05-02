@@ -1,5 +1,11 @@
 # !/usr/bin/env python
 
+# use package in other directory
+path='D:/uniswaptrade/env/Lib/site-packages'
+import sys
+if path not in sys.path:
+    sys.path.append(path)
+
 import logging
 from binance.spot import Spot as Client
 from binance.lib.utils import config_logging
