@@ -434,6 +434,11 @@ html_content = f"""
 """
 st.markdown(html_content, unsafe_allow_html=True)
 
+
+
+
+
+
 # st.markdown(f'**ETH/usdc** {round(ethusdc_price,2)}')
 # st.markdown(f'**ETH/arb** {round(arbeth_price,2)}')
 # st.markdown(f'**ARB/usdc** {round(arbusdc_price,2)}')
@@ -537,6 +542,10 @@ st.plotly_chart(fig, use_container_width=True)
 
 fig=get_hourly_locked_token_chart()
 st.plotly_chart(fig, use_container_width=True)
+
+st.title("Uniswap Pool Explorer")
+uniswap_pool_url = "https://app.uniswap.org/explore/pools/arbitrum/0xC6F780497A95e246EB9449f5e4770916DCd6396A"
+st.components.v1.iframe(uniswap_pool_url, width=800, height=600, scrolling=True)
 
 # total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
 # st.markdown(f'**total amount0** {total_amount0_}')

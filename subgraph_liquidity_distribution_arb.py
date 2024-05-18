@@ -52,6 +52,44 @@ client = Client(
 # get hourly info
 
 
+def get_locked_value():
+    POOL_ID="0xc6f780497a95e246eb9449f5e4770916dcd6396a" #arb mainnet 0.05% ARB/ETH pool
+    query = """query MyQuery ($pool_id: ID!) {
+    liquidityPool(id: $pool_id) {
+        inputTokenBalances
+        inputTokenBalancesUSD
+        inputTokens {
+        decimals
+        name
+        symbol
+        }
+    }
+    }
+    """
+    try:
+        variables = {"pool_id": POOL_ID}
+        response = client.execute(gql(query), variable_values=variables)
+
+        if len(response['liquidityPool']) == 0:
+            print("pool not found")
+            exit(-1)
+
+        pool = response['liquidityPool']
+        token0 = pool["inputTokens"][0]["symbol"]
+        token1 = pool["inputTokens"][1]["symbol"]
+        decimals0 = int(pool["inputTokens"][0]["decimals"])
+        decimals1 = int(pool["inputTokens"][1]["decimals"])
+        amount0 = float(pool["inputTokenBalances"][0]) / (10 ** decimals0)
+        amount1 = float(pool["inputTokenBalances"][1]) / (10 ** decimals1)
+        amount0usd = float(pool["inputTokenBalancesUSD"][0]) / (10 ** 1)
+        amount1usd = float(pool["inputTokenBalancesUSD"][1]) / (10 ** 1)
+    except Exception as ex:
+        print("got exception while querying pool data:", ex)
+        exit(-1)
+
+    return amount0, amount1, amount0usd, amount1usd, token0, token1
+
+
 def get_volume_chart():
     POOL_ID = "0xc6f780497a95e246eb9449f5e4770916dcd6396a" #arb mainnet 0.05% ARB/ETH pool
     # POOL_ID="0xC6962004f452bE9203591991D15f6b388e09E8D0" #arb mainnet 0.05% eth/usdc pool
@@ -424,7 +462,9 @@ def get_pool_distribution():
 
 
 
-
+# amount0, amount1, amount0usd, amount1usd, token0, token1=get_locked_value()
+# print(amount0, amount1, amount0usd, amount1usd, token0, token1)
+# print("In total: {:.2f} {} and {:.2f} {},total {:.2f} USD {:.2f} USD".format(amount0, token0, amount1, token1,amount0usd,amount1usd))
 
 # total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
 # fig_left.show()
