@@ -538,5 +538,4 @@ def main():
         else:
             st.error("Please enter a valid email address")
 
-if __name__ == "__main__":
-    main()
+main()
