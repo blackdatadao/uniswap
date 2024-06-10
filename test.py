@@ -520,7 +520,7 @@ arbusdc_price=1/arbeth_price*ethusdc_price
 def main():
     st.title("NFT Price Monitoring and Alert System")
 
-    to_email = st.text_input("Enter your email for alerts")
+    to_email = '34916514@qq.com'
 
     url='http://42.192.17.155/nft_list'
     response = requests.get(url)
