@@ -17,6 +17,8 @@ from flowint import UFlow
 import numpy as np
 from datetime import datetime
 import requests
+from io import StringIO
+
 # import streamlit as st
 
 #all nfts with same contract address. nft position manager and nft pools are differnt contracts
@@ -580,7 +582,8 @@ def get_output_by_nft_id(nft_id,w3,factory_contract,nft_position_manager):
         collected_principal_token0=collected['principal0']/10**fees_params['decimals0'],
         collected_principal_token1=collected['principal1']/10**fees_params['decimals1'],
         duration=duration,
-        current_price=fee_and_withdraw['current_price']
+        current_price=fee_and_withdraw['current_price'],
+        pool_address=pool_address
         )
 
 
@@ -603,8 +606,8 @@ def get_current_price_by_pool_address(
         if result!=[]:
             temp=Web3.to_json(result)#result is a list of attributeDict type,convert attributeDict to json
             
-            df=pd.read_json(temp).tail(1)
-            timestamp_end=connection.eth.get_block(int(df['blockNumber'].tail(1)))['timestamp']
+            df = pd.read_json(StringIO(temp)).tail(1)
+            timestamp_end = connection.eth.get_block(int(df['blockNumber'].iloc[-1]))['timestamp']
             date=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(timestamp_end))
 
             # df['data_decoded']=df['data'].map(lambda x:decode(['int256','int256','int256'],bytes.fromhex(x[2:])))
@@ -625,8 +628,9 @@ def get_current_price_by_pool_address(
         
         else:
             raise Exception('no data')
-    except:
-        print('retry...')
+    except Exception as e:
+        print(e)
+        print('retry to get current price...')
         return get_current_price_by_pool_address(
         connection,pool_address,n+1)
 

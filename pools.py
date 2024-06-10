@@ -45,7 +45,7 @@ def dune_embed_url(iframe_url):
     iframe(iframe_url, width=i_width, height=i_height, scrolling=True)
 
 def nft_infomration_to_show(nft_list):
-    # df=nft_df
+    #return data with columns 'nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration','current_price'
     nft_data = get_pools_details(nft_list)
     df3=pd.DataFrame(nft_data)
     #create a new column 'symbol1_price',if symbol1 is arb,then symbole1_price is the arbusdc_price,else is the 1
@@ -55,7 +55,7 @@ def nft_infomration_to_show(nft_list):
     df3['fee_usdc']=df3['current_fee0']*df3['symbol0_price']+df3['current_fee1']*df3['symbol1_price']
     df3['value']=df3['withdrawable_tokens0']*df3['symbol0_price']+df3['withdrawable_tokens1']*df3['symbol1_price']
 
-    df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration','current_price']]
+    df4=df3[['nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration','current_price','pool_address']]
     #convert time object of df3['create_time'] to time object with format '%m-%d %H:%M'
     df4['create_time']=df4['create_time'].map(lambda x:datetime.strptime(x,'%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M'))
     df4['tick_avg']=(df4['tick_lower']+df4['tick_upper'])/2
@@ -434,11 +434,6 @@ html_content = f"""
 """
 st.markdown(html_content, unsafe_allow_html=True)
 
-
-
-
-
-
 # st.markdown(f'**ETH/usdc** {round(ethusdc_price,2)}')
 # st.markdown(f'**ETH/arb** {round(arbeth_price,2)}')
 # st.markdown(f'**ARB/usdc** {round(arbusdc_price,2)}')
@@ -463,6 +458,7 @@ df_open_nft=nft_infomration_to_show(df['nft_id'])
 df_inrange=df_open_nft[(df_open_nft['current_price']>=df_open_nft['tick_lower'])&(df_open_nft['current_price']<=df_open_nft['tick_upper'])]
 # select the data from df4 where current price is not in range of tick_lower and tick_upper
 df_outrange=df_open_nft[(df_open_nft['current_price']<df_open_nft['tick_lower'])|(df_open_nft['current_price']>df_open_nft['tick_upper'])]
+
 summary_inrange=get_summary(df_inrange)
 summary_outrange=get_summary(df_outrange)
 summary=get_summary(df_open_nft)
@@ -545,7 +541,8 @@ st.plotly_chart(fig, use_container_width=True)
 
 st.title("Uniswap Pool Explorer")
 uniswap_pool_url = "https://app.uniswap.org/explore/pools/arbitrum/0xC6F780497A95e246EB9449f5e4770916DCd6396A"
-st.components.v1.iframe(uniswap_pool_url, width=800, height=600, scrolling=True)
+# st.components.v1.iframe(uniswap_pool_url, width=800, height=600, scrolling=True)
+st.markdown(f"[official data]({uniswap_pool_url})")
 
 # total_amount0_,total_amount1_,current_price,fig_left,fig_right=get_pool_distribution()
 # st.markdown(f'**total amount0** {total_amount0_}')
@@ -553,6 +550,9 @@ st.components.v1.iframe(uniswap_pool_url, width=800, height=600, scrolling=True)
 # st.markdown(f'**current price** {current_price}')
 # st.plotly_chart(fig_left, use_container_width=True)
 # st.plotly_chart(fig_right, use_container_width=True)
+
+#CME future chart
+# https://www.cmegroup.com/apps/cmegroup/widgets/productLibs/esignal-charts.html?type=p&code=ETH&title=Chart+-+Jun+2024+Ether&venue=0&monthYear=M4&year=2024&exchangeCode=XCME&interval=1
 
 #eth/usdc 0.05
 dune_embed_url("https://dune.com/embeds/3598735/6063295/")

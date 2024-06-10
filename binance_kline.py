@@ -16,9 +16,9 @@ from plotly.subplots import make_subplots
 
 config_logging(logging, logging.DEBUG)
 
-def get_kline_data_from_binance(symbol, interval, limit):
-    spot_client = Client(base_url="https://testnet.binance.vision")
-    kline_data = spot_client.klines(symbol, interval, limit=limit)
+def get_kline_data_from_binance(symbol, interval, limit,startTime=None,endTime=None):
+    spot_client = Client(base_url="http://data-api.binance.vision")
+    kline_data = spot_client.klines(symbol, interval, limit=limit,startTime=startTime,endTime=endTime)
     kline_data = pd.DataFrame(kline_data)
     kline_data.columns = ['Open Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote Asset Volume', 'Number of Trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore']
     kline_data['Open Time'] = pd.to_datetime(kline_data['Open Time'], unit='ms')
@@ -42,6 +42,8 @@ def reverse_price(kline_data):
     kline_data['Low'] = 1 / kline_data['Low']
     kline_data['Close'] = 1 / kline_data['Close']
     return kline_data
+
+
 
 # spot_client = Client(base_url="https://testnet.binance.vision")
 
@@ -383,7 +385,8 @@ def calculate_rolling_volatility(asset_df, n, price_column='Close'):
 # Assuming `asset_df` is your DataFrame with the price data
 # rolling_volatility = calculate_rolling_volatility(asset_df, 20)
 
-# ARBETH=get_kline_data_from_binance('ETHUSDT','1h',72)
+# ARBETH=get_kline_data_from_binance('ETHUSDT','4h',10000)
+# c=1
 # plot_kline_data(ARBETH,'ARBETH').show()
 
 # ETHARB=reverse_price(ARBETH)
@@ -411,6 +414,11 @@ def calculate_rolling_volatility(asset_df, n, price_column='Close'):
 # from binance.spot import Spot
 
 # client = Spot()
+# # from binance.spot import Spot as Client
+
+# # proxies = { 'https': 'https://127.0.0.1:3213', 'http': 'http://127.0.0.1:3213',}
+
+# # client= Client(proxies=proxies)
 
 # # Get server timestamp
 # print(client.time())
@@ -418,3 +426,298 @@ def calculate_rolling_volatility(asset_df, n, price_column='Close'):
 # print(client.klines("BTCUSDT", "1m"))
 # # Get last 10 klines of BNBUSDT at 1h interval
 # print(client.klines("BNBUSDT", "1h", limit=10))
+
+# import httpx
+
+# class BinanceClient:
+#     def __init__(self, api_key=None, api_secret=None, proxies=None, timeout=30):
+#         # self.api_key = api_key
+#         # self.api_secret = api_secret
+#         self.proxies = proxies
+#         self.timeout = timeout
+    
+#     def query(self, endpoint, params):
+#         url = f'https://api.binance.com{endpoint}'
+#         with httpx.Client(proxies=self.proxies, timeout=self.timeout) as client:
+#             response = client.get(url, params=params)
+#             response.raise_for_status()  # Raise an exception for HTTP errors
+#             return response.json()
+
+#     def klines(self, symbol: str, interval: str, **kwargs):
+#         """Kline/Candlestick Data
+
+#         GET /api/v3/klines
+
+#         https://binance-docs.github.io/apidocs/spot/en/#kline-candlestick-data
+
+#         Args:
+#             symbol (str): the trading pair
+#             interval (str): the interval of kline, e.g 1s, 1m, 5m, 1h, 1d, etc.
+#         Keyword Args:
+#             limit (int, optional): limit the results. Default 500; max 1000.
+#             startTime (int, optional): Timestamp in ms to get aggregate trades from INCLUSIVE.
+#             endTime (int, optional): Timestamp in ms to get aggregate trades until INCLUSIVE.
+#         """
+#         self.check_required_parameters([[symbol, "symbol"], [interval, "interval"]])
+#         params = {"symbol": symbol, "interval": interval, **kwargs}
+#         return self.query("/api/v3/klines", params)
+    
+#     def check_required_parameters(self, parameters):
+#         for param, name in parameters:
+#             if param is None:
+#                 raise ValueError(f"Parameter {name} is required")
+
+# # Example usage
+# client = BinanceClient(timeout=60)
+
+# symbol = "BTCUSDT"
+# interval = "1h"
+# start_time = 1625097600000  # Example timestamp in milliseconds
+# end_time = 1625184000000  # Example timestamp in milliseconds
+
+# # Calling the klines function with startTime and endTime
+# try:
+#     klines_data = client.klines(symbol=symbol, interval=interval, startTime=start_time, endTime=end_time)
+#     print(klines_data)
+# except httpx.RequestError as e:
+#     print(f"An error occurred: {e}")
+
+# import requests
+
+# def get_binance_time():
+#     url = "http://data-api.binance.vision/api/v3/klines?symbol=ETHUSDT&interval=1h&limit=100000"
+    
+#     try:
+#         response = requests.get(url, timeout=60,verify=False)  # Increase timeout if needed
+#         response.raise_for_status()  # Raise an exception for HTTP errors
+#         data = response.json()  # Parse the JSON response
+#         return data
+#     except requests.exceptions.RequestException as e:
+#         print(f"An error occurred: {e}")
+#         return None
+
+def get_binance_future(symbol, interval, limit,startTime=None,endTime=None):
+    import requests
+    url=f"https://testnet.binancefuture.com/fapi/v1/klines?symbol={symbol}&interval={interval}&limit={limit}"
+    try:
+        response = requests.get(url, timeout=60,verify=False)  # Increase timeout if needed
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        data = response.json()  # Parse the JSON response
+        return data
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        return None
+
+def get_binance_spot(symbol, interval, limit,startTime=None,endTime=None):
+    import requests
+    url=f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
+    try:
+        response = requests.get(url, timeout=60,verify=False)  # Increase timeout if needed
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        data = response.json()  # Parse the JSON response
+        return data
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        return None
+
+
+# # Fetch Binance time
+# binance_time = get_binance_time()
+# kline_data = pd.DataFrame(binance_time)
+# print(binance_time)
+
+import time
+
+def get_all_kline_data(symbol, interval, startTime, endTime=None):
+    all_data = []
+    limit = 1000
+    spot_client = Client(base_url="http://data-api.binance.vision")
+    while True:
+        
+        kline_data = spot_client.klines(symbol, interval, limit=limit,startTime=startTime,endTime=endTime)
+        
+        if len(kline_data) == 0:
+            break
+        
+        all_data.extend(kline_data)
+        
+        # Update the startTime to the time of the last received data point to avoid overlap
+        startTime = kline_data[-1][0] + 1  # Increment by 1 to avoid duplicating the last entry
+        
+        # Break the loop if the number of data points received is less than the limit
+        if len(kline_data) < limit:
+            break
+        
+        # Optional: Sleep to avoid hitting the rate limit
+        time.sleep(1)
+    
+    kline_data = pd.DataFrame(all_data)
+    kline_data.columns = ['Open Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote Asset Volume', 'Number of Trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore']
+    kline_data['Open Time'] = pd.to_datetime(kline_data['Open Time'], unit='ms')
+    kline_data['Close Time'] = pd.to_datetime(kline_data['Close Time'], unit='ms')
+    kline_data['Open'] = kline_data['Open'].astype(float)
+    kline_data['High'] = kline_data['High'].astype(float)
+    kline_data['Low'] = kline_data['Low'].astype(float)
+    kline_data['Close'] = kline_data['Close'].astype(float)
+    # check if the high is greater than 10% of the average of the open and close, replace the high with the 110% of the average of the open and close
+    kline_data['High'] = kline_data.apply(lambda x: x['High'] if x['High'] < 1.05 * (x['Open']+x['Close'])/2 else 1.0 * (x['Open']+x['Close'])/2, axis=1)
+    # check if the low is less than 70% of the average of the open and close, replace the low with the 70% of the average of the open and close
+    kline_data['Low'] = kline_data.apply(lambda x: x['Low'] if x['Low'] > 0.95 * (x['Open']+x['Close'])/2 else 1 * (x['Open']+x['Close'])/2, axis=1)
+    #average price
+    kline_data['average']=kline_data[['Open','High','Low','Close']].mean(axis=1)
+    kline_data['normalized_close']=kline_data['Close']/kline_data['Close'].iloc[0]
+    kline_data['rsi']=calculate_rsi(kline_data, window=14)
+    
+    return kline_data
+
+
+def get_all_kline_future(symbol, interval, startTime, endTime=None):
+    all_data = []
+    limit = 1000
+    while True:
+        
+        kline_data = get_binance_future(symbol, interval, limit,startTime=startTime,endTime=endTime)
+        
+        if len(kline_data) == 0:
+            break
+        
+        all_data.extend(kline_data)
+        
+        # Update the startTime to the time of the last received data point to avoid overlap
+        startTime = kline_data[-1][0] + 1  # Increment by 1 to avoid duplicating the last entry
+        
+        # Break the loop if the number of data points received is less than the limit
+        if len(kline_data) < limit:
+            break
+        
+        # Optional: Sleep to avoid hitting the rate limit
+        time.sleep(1)
+    
+    kline_data = pd.DataFrame(all_data)
+    kline_data.columns = ['Open Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote Asset Volume', 'Number of Trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore']
+    kline_data['Open Time'] = pd.to_datetime(kline_data['Open Time'], unit='ms')
+    kline_data['Close Time'] = pd.to_datetime(kline_data['Close Time'], unit='ms')
+    kline_data['Open'] = kline_data['Open'].astype(float)
+    kline_data['High'] = kline_data['High'].astype(float)
+    kline_data['Low'] = kline_data['Low'].astype(float)
+    kline_data['Close'] = kline_data['Close'].astype(float)
+    # check if the high is greater than 10% of the average of the open and close, replace the high with the 110% of the average of the open and close
+    kline_data['High'] = kline_data.apply(lambda x: x['High'] if x['High'] < 1.05 * (x['Open']+x['Close'])/2 else 1.0 * (x['Open']+x['Close'])/2, axis=1)
+    # check if the low is less than 70% of the average of the open and close, replace the low with the 70% of the average of the open and close
+    kline_data['Low'] = kline_data.apply(lambda x: x['Low'] if x['Low'] > 0.95 * (x['Open']+x['Close'])/2 else 1 * (x['Open']+x['Close'])/2, axis=1)
+    #average price
+    kline_data['average']=kline_data[['Open','High','Low','Close']].mean(axis=1)
+    kline_data['normalized_close']=kline_data['Close']/kline_data['Close'].iloc[0]
+    kline_data['rsi']=calculate_rsi(kline_data, window=14)
+    
+    return kline_data
+
+def calculate_rsi(data, window=14):
+    # Calculate the price changes
+    delta = data['Close'].diff()
+    
+    # Separate the gains and losses
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
+    
+    # Calculate the average gains and losses
+    avg_gain = gain.rolling(window=window, min_periods=1).mean()
+    avg_loss = loss.rolling(window=window, min_periods=1).mean()
+    
+    # Calculate the Relative Strength (RS)
+    rs = avg_gain / avg_loss
+    
+    # Calculate the RSI
+    rsi = 100 - (100 / (1 + rs))
+    
+    return rsi
+
+def binance_spot_future_spread():
+    import pandas as pd
+    import plotly.express as px
+
+    symbol = "ETHUSDT"
+    interval = "1h"
+    limit = 1000
+
+    spot_data = get_binance_spot(symbol, interval, limit)
+    future_data = get_binance_future(symbol, interval, limit)
+
+    # Convert data to DataFrame
+    columns = ["Open time", "Open", "High", "Low", "Close", "Volume", "Close time", 
+            "Quote asset volume", "Number of trades", "Taker buy base asset volume", 
+            "Taker buy quote asset volume", "Ignore"]
+
+    spot_df = pd.DataFrame(spot_data, columns=columns)
+    future_df = pd.DataFrame(future_data, columns=columns)
+
+    # Convert "Open time" to datetime for better handling
+    spot_df['Open time'] = pd.to_datetime(spot_df['Open time'], unit='ms')
+    future_df['Open time'] = pd.to_datetime(future_df['Open time'], unit='ms')
+
+    # Merge data on "Open time" to ensure they have the same times
+    merged_df = pd.merge(spot_df, future_df, on="Open time", suffixes=('_spot', '_future'))
+
+    # Calculate the difference between corresponding open prices
+    merged_df['Open Difference Percentage'] = ((merged_df['Open_future'].astype(float) - merged_df['Open_spot'].astype(float)) / merged_df['Open_spot'].astype(float)) * 100
+
+    # Create a figure with two y-axes
+    fig = go.Figure()
+
+    # Add spot price trace
+    fig.add_trace(
+        go.Scatter(
+            x=merged_df['Open time'],
+            y=merged_df['Open_spot'].astype(float),
+            name='Spot Price',
+            yaxis='y1'
+        )
+    )
+
+    # Add percentage difference trace
+    fig.add_trace(
+        go.Scatter(
+            x=merged_df['Open time'],
+            y=merged_df['Open Difference Percentage'],
+            name='Open Price Difference Percentage (Future - Spot)',
+            yaxis='y2'
+        )
+    )
+
+    # Update layout to include two y-axes
+    fig.update_layout(
+        title='Spot Price and Open Price Difference Percentage for ETH',
+        xaxis_title='Time',
+        yaxis=dict(
+            title='Spot Price',
+            titlefont=dict(
+                color='#1f77b4'
+            ),
+            tickfont=dict(
+                color='#1f77b4'
+            )
+        ),
+        yaxis2=dict(
+            title='Open Price Difference Percentage',
+            titlefont=dict(
+                color='#ff7f0e'
+            ),
+            tickfont=dict(
+                color='#ff7f0e'
+            ),
+            anchor='x',
+            overlaying='y',
+            side='right'
+        ),
+        legend=dict(
+            x=0.01,
+            y=0.99,
+            bgcolor='rgba(255,255,255,0)',
+            bordercolor='rgba(255,255,255,0)'
+        )
+    )
+
+    fig.show()
+
+
+

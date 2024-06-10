@@ -1,11 +1,25 @@
-from binance_kline import get_kline_data_from_binance,reverse_price,plot_price_comparison,plot_kline_data,calculate_rolling_beta,plot_dual_axis_time_series_plotly,calculate_rolling_beta_and_correlation,plot_dual_axis_time_series_plotly_three,calculate_rolling_volatility
+from binance_kline import get_all_kline_data,get_all_kline_future,get_kline_data_from_binance,reverse_price,plot_price_comparison,plot_kline_data,calculate_rolling_beta,plot_dual_axis_time_series_plotly,calculate_rolling_beta_and_correlation,plot_dual_axis_time_series_plotly_three,calculate_rolling_volatility
 import pandas as pd
 from scipy import spatial
 
-length=24*1200+1
-# ethusd=get_kline_data_from_binance('ETHUSDT','1h',length)    
-# ethusd.to_csv('ethusd.csv')
-#read the data from the csv file
+length=24*60+1
+start_time='2024-01-01 00:00:00'
+#change start time to timestamp
+start_time=int(pd.to_datetime(start_time).timestamp()*1000)
+symbol='ETHUSDT'
+interval='1h'
+limit=10000
+ethusd=get_all_kline_data(symbol, interval, start_time, endTime=None)
+ethusdf=get_all_kline_future(symbol, interval, start_time, endTime=None)
+diff=ethusd['Close']-ethusdf['Close']
+#plot diff
+plot_price_comparison(diff, 'ETHUSDT', 'ETHUSDT_FUTURE').show()
+
+# ethusd=get_kline_data_from_binance(symbol=symbol, interval=interval, limit=limit,startTime=start_time)    
+# ethusd=get_kline_data_from_binance('ETHUSDT','1h',500,startTime=start_time)    
+
+ethusd.to_csv('ethusd_120d_1h.csv')
+# read the data from the csv file
 ethusd = pd.read_csv('ethusd.csv')
 #calculate the percentage change in close price of ETHUSDT
 ethusd['percentage_change'] = ethusd['Close'].pct_change()
@@ -79,9 +93,15 @@ fig.add_trace(go.Scatter(x=time1,y=value2, mode='lines', name='value2'))
 # fig.add_trace(go.Scatter(x=time_list[change_group[2][0]],y=value3, mode='lines', name='value3'))
 fig.add_trace(go.Scatter(x=time1,y=value0, mode='lines', name='value0'))
 
-fig.show()
+# Save the plot to an HTML file
+plot_file = 'plot.html'
+fig.write_html(plot_file)
+import webbrowser
+import os
+# Open the HTML file in the default web browser
+webbrowser.open('file://' + os.path.realpath(plot_file))
 
 
 # #convert the change_group to a dataframe called df which has m columns each column has n data points
 # df = pd.DataFrame(change_group).T
-c=1
+# c=1
