@@ -442,7 +442,7 @@ def fetch_and_check_periodically(nft_data, to_email):
         initialize_previous_prices(nft_data)
         check_and_alert(nft_data, to_email)
         print('checked once time')
-        time.sleep(10)
+        time.sleep(30)
         # st.experimental_rerun()
 
 import smtplib
