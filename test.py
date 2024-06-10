@@ -434,8 +434,7 @@ def check_and_alert(df, to_email):
     if sent==True:
         send_email(subject, body, to_email)
         sent=False
-    else:
-        send_email('no alert', 'no alert', to_email)
+
 
 def fetch_and_check_periodically(nft_data, to_email):
     while True:
