@@ -434,8 +434,12 @@ def check_and_alert(df, to_email):
     if sent==True:
         send_email(subject, body, to_email)
         sent=False
+<<<<<<< HEAD
     # else:
     #     send_email('no alert', 'no alert', to_email)
+=======
+
+>>>>>>> 7968d5dd779656466b0a4c56639e808f98e9f7c4
 
 def fetch_and_check_periodically(nft_data, to_email):
     global monitoring
@@ -526,11 +530,15 @@ def main():
     initialize_web3()
     st.title("NFT Price Monitoring and Alert System")
 
+<<<<<<< HEAD
     if 'button_label' not in st.session_state:
         st.session_state['button_label'] = 'Start Monitoring'
 
     # to_email = st.text_input("Enter your email for alerts")
     to_email='34916514@qq.com'
+=======
+    to_email = '34916514@qq.com'
+>>>>>>> 7968d5dd779656466b0a4c56639e808f98e9f7c4
 
     url='http://42.192.17.155/nft_list'
     response = requests.get(url)
@@ -538,6 +546,7 @@ def main():
     nfts_list=response.json()
     nft_list=pd.DataFrame(nfts_list)
 
+<<<<<<< HEAD
     # ethusdc_price=my.get_current_price_by_pool_address(w3,'0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443',1)['price0']
     # arbeth_price=my.get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
     # arbusdc_price=1/arbeth_price*ethusdc_price
@@ -562,4 +571,6 @@ def main():
         st.success("Monitoring canceled")
 
 
+=======
+>>>>>>> 7968d5dd779656466b0a4c56639e808f98e9f7c4
 main()
