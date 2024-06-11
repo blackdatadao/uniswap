@@ -439,6 +439,7 @@ def check_and_alert(df, to_email):
 
 def fetch_and_check_periodically(nft_data, to_email):
     global monitoring
+    monitoring = True
         # nft_data = nft_infomration_to_show(nft_list)
     initialize_previous_prices(nft_data)
     while monitoring:
