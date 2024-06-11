@@ -434,8 +434,8 @@ def check_and_alert(df, to_email):
     if sent==True:
         send_email(subject, body, to_email)
         sent=False
-    # else:
-    #     send_email('no alert', 'no alert', to_email)
+    else:
+        send_email('no alert', 'no alert', to_email)
 
 def fetch_and_check_periodically(nft_data, to_email):
     global monitoring
@@ -519,15 +519,10 @@ def initialize_web3():
 
 
 
-# Streamlit Interface
 def main():
     global monitoring,ethusdc_price, arbeth_price, arbusdc_price
     monitoring = False
     initialize_web3()
-    st.title("NFT Price Monitoring and Alert System")
-
-    if 'button_label' not in st.session_state:
-        st.session_state['button_label'] = 'Start Monitoring'
 
     # to_email = st.text_input("Enter your email for alerts")
     to_email='34916514@qq.com'
@@ -538,28 +533,14 @@ def main():
     nfts_list=response.json()
     nft_list=pd.DataFrame(nfts_list)
 
-    # ethusdc_price=my.get_current_price_by_pool_address(w3,'0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443',1)['price0']
-    # arbeth_price=my.get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
-    # arbusdc_price=1/arbeth_price*ethusdc_price
-    # #select the nfts which is open from the nft_list 
-    # df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
+    ethusdc_price=my.get_current_price_by_pool_address(w3,'0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443',1)['price0']
+    arbeth_price=my.get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
+    arbusdc_price=1/arbeth_price*ethusdc_price
+    #select the nfts which is open from the nft_list 
+    df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
 
-    # df_open_nft=nft_infomration_to_show(df['nft_id'])
-
-
-    if st.button(st.session_state['button_label']):
-        monitoring = True
-    
-    if to_email and monitoring:
-            st.session_state['button_label'] = 'Monitoring on'
-            # threading.Thread(target=fetch_and_check_periodically, args=(df_open_nft, to_email), daemon=True).start()
-    # else:
-    #     st.error("Please enter a valid email address")
-
-    if st.button("Cancel Monitoring"):
-        monitoring = False
-        st.session_state['button_label'] = 'Start Monitoring'
-        st.success("Monitoring canceled")
+    df_open_nft=nft_infomration_to_show(df['nft_id'])
+    fetch_and_check_periodically(df_open_nft, to_email)
 
 
 main()
