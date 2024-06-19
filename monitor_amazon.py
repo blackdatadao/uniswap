@@ -45,6 +45,9 @@ def dune_embed_url(iframe_url):
     iframe(iframe_url, width=i_width, height=i_height, scrolling=True)
 
 def nft_infomration_to_show(nft_list):
+    ethusdc_price=my.get_current_price_by_pool_address(w3,'0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443',1)['price0']
+    arbeth_price=my.get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
+    arbusdc_price=1/arbeth_price*ethusdc_price
     #return data with columns 'nft_id','symbol0','symbol1','tick_lower','tick_upper','fee_usdc','withdrawable_tokens0','withdrawable_tokens1','create_time','create_token0','create_token1','value','duration','current_price'
     nft_data = get_pools_details(nft_list)
     df3=pd.DataFrame(nft_data)
@@ -428,17 +431,21 @@ def check_and_alert(df, to_email):
                 (prev_price > row['tick_lower'] and current_price <= row['tick_lower']) or \
                    (prev_price < row['tick_upper'] and current_price >= row['tick_upper']):
                     subject = f"Price Alert {current_price}"
-                    body =body.append(f"\nThe current price {current_price} has crossed NFT ID {nft_id}.\n\nDetails:\n{row}")
+                    body.append(f"\nThe current price {current_price} has crossed NFT ID {nft_id}.\n\nDetails:\n{row}")
                     sent=True
+                    print(f'current price {current_price}passed nft{nft_id}')
+                    print(row['tick_lower'],prev_price)
+                    print(body)
         previous_prices[nft_id] = current_price
     if sent==True:
-        send_email(subject, body, to_email)
+        send_email(subject, ''.join(body), to_email)
         sent=False
     # else:
     #     send_email('no alert', 'no alert', to_email)
 
-def fetch_and_check_periodically(nft_data, to_email):
+def fetch_and_check_periodically(to_email):
     global monitoring
+    nft_data=update_nft_list()
     monitoring = True
         # nft_data = nft_infomration_to_show(nft_list)
     initialize_previous_prices(nft_data)
@@ -446,6 +453,12 @@ def fetch_and_check_periodically(nft_data, to_email):
         check_and_alert(nft_data, to_email)
         print('checked once time')
         time.sleep(30)
+        nft_data_new=update_nft_list()
+        if nft_data_new.equals(nft_data):
+            pass
+        else:
+            nft_data=nft_data_new
+            initialize_previous_prices(nft_data)
         # st.experimental_rerun()
 
 import smtplib
@@ -453,6 +466,23 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 import time
+
+def update_nft_list():
+    try:
+        my.update_nft_list(wallet_address,w3,nft_position_manager)
+    except:
+        print('error,retry update nft list...')
+        my.update_nft_list(wallet_address,w3,nft_position_manager)
+    print('update nft_list finished,wallet address ',wallet_address)
+
+    url='http://42.192.17.155/nft_list'
+    response = requests.get(url)
+    assert response.status_code==200
+    nfts_list=response.json()
+    nft_list=pd.DataFrame(nfts_list)
+    df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
+    df_open_nft=nft_infomration_to_show(df['nft_id'])
+    return df_open_nft
 
 def send_email(subject, body, to_email):
 
@@ -482,7 +512,7 @@ def send_email(subject, body, to_email):
         # st.error(f"Failed to send email: {e}")
 
 def initialize_web3():
-    global w3, nft_position_manager, factory_contract
+    global w3, nft_position_manager, factory_contract,wallet_address
     factory_address='0x1F98431c8aD98523631AE4a59f267346ea31F984'
     contract_address='0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
     provider_arb='https://arb1.arbitrum.io/rpc'
@@ -521,27 +551,14 @@ def initialize_web3():
 
 
 def main():
-    global monitoring,ethusdc_price, arbeth_price, arbusdc_price
+    global monitoring
     monitoring = False
     initialize_web3()
 
     # to_email = st.text_input("Enter your email for alerts")
     to_email='34916514@qq.com'
 
-    url='http://42.192.17.155/nft_list'
-    response = requests.get(url)
-    assert response.status_code==200
-    nfts_list=response.json()
-    nft_list=pd.DataFrame(nfts_list)
-
-    ethusdc_price=my.get_current_price_by_pool_address(w3,'0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443',1)['price0']
-    arbeth_price=my.get_current_price_by_pool_address(w3,'0xc6f780497a95e246eb9449f5e4770916dcd6396a',1)['price0']
-    arbusdc_price=1/arbeth_price*ethusdc_price
-    #select the nfts which is open from the nft_list 
-    df=nft_list[nft_list['closed']=='open'][0:]#delete a unnormal one
-
-    df_open_nft=nft_infomration_to_show(df['nft_id'])
-    fetch_and_check_periodically(df_open_nft, to_email)
+    fetch_and_check_periodically(to_email)
 
 
 main()
